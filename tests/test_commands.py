@@ -63,3 +63,27 @@ def test_custom_commands_match_exact_phrase():
     assert parse("New tab.", custom=custom) == Action("custom", "new tab")
     assert parse("open my CRM", custom=custom) == Action("custom", "Open my CRM")   # beats built-in "open"
     assert parse("open a new tab please", custom=custom).kind == "switch"
+
+
+@pytest.mark.parametrize("heard,expected", [
+    ("Make this more professional.", Action("ai_edit", "make this more professional")),
+    ("Translate that to Spanish", Action("ai_edit", "translate that to spanish")),
+    ("Write a reply saying I'll be there at 5.", Action("ai_write", "write a reply saying i ll be there at 5")),
+    ("Start dictation.", Action("dictate_on")),
+    ("Stop dictation", Action("dictate_off")),
+    ("That's all.", Action("dictate_off")),
+    ("What can I say?", Action("ui", "Commands")),
+    ("Open Sayso settings", Action("ui", "Settings")),
+    ("Open Chrome", Action("switch", "chrome")),              # still a normal app
+])
+def test_smart_commands(heard, expected):
+    assert parse(heard) == expected
+
+
+def test_ai_commands_not_in_plain_dictation():
+    assert parse("make this more professional", allow_commands=False).kind == "type"
+
+
+def test_write_without_ai_is_just_dictation():
+    assert parse("Write a note to Mike", ai_ready=False) == Action("type", "Write a note to Mike")
+    assert parse("Make this shorter", ai_ready=False).kind == "ai_edit"   # explains how to turn AI on

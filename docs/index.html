@@ -66,7 +66,7 @@
     <h1>Type anywhere<br>with your <em>voice</em>.</h1>
     <p class="lead">Say "Sayso", then talk. Your words appear in whatever app you're in: email, chat, docs, code editors, AI assistants. Free, and it runs on your own PC.</p>
     <div id="get">
-      <div id="signin">
+      <div id="signin" hidden>
         <button class="btn" data-provider="google">
           <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
           Continue with Google
@@ -77,12 +77,13 @@
         </button>
         <p class="small">Sign in once to download. Free and open source · Windows 10 and 11 (64-bit)</p>
       </div>
-      <div id="signedin" hidden>
-        <a class="btn" id="download" href="#">
+      <div id="signedin">
+        <a class="btn" id="download" href="https://github.com/gearwithai/sayso/releases/latest/download/SaysoSetup.exe">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M6 11l6 6 6-6M4 21h16"/></svg>
           Download for Windows
         </a>
-        <p class="small">Signed in as <b id="who"></b> · <a href="#" id="signout">Sign out</a></p>
+        <p class="small" id="direct">Free and open source · Windows 10 and 11 (64-bit) · No account needed</p>
+        <p class="small" id="acct" hidden>Signed in as <b id="who"></b> · <a href="#" id="signout">Sign out</a></p>
       </div>
       <p class="small err" id="err" hidden></p>
       <p class="small" id="count" hidden></p>
@@ -92,13 +93,15 @@
   <section class="say" aria-label="Examples">
     <div class="row"><span class="q">"Sayso, hello world"</span><span class="a">types "hello world"</span></div>
     <div class="row"><span class="q">"Sayso, fix the login bug. Send."</span><span class="a">types it and presses Enter</span></div>
+    <div class="row"><span class="q">"Sayso, make that more professional"</span><span class="a">AI rewrites what you just said</span></div>
+    <div class="row"><span class="q">"Sayso, translate this to Spanish"</span><span class="a">AI translates the selected text</span></div>
     <div class="row"><span class="q">"Sayso, open Chrome"</span><span class="a">switches to or opens the app</span></div>
     <div class="row"><span class="q">Hold Right Ctrl and talk</span><span class="a">types when you let go</span></div>
   </section>
 
   <h2>Set up once, in a minute</h2>
   <div class="grid">
-    <div class="card"><span class="n">1</span><b>Sign in and download</b><p>Continue with Google or GitHub, then run SaysoSetup.exe. No admin rights needed.</p></div>
+    <div class="card"><span class="n">1</span><b>Download and run</b><p>Run SaysoSetup.exe. No account and no admin rights needed.</p></div>
     <div class="card"><span class="n">2</span><b>Check your mic</b><p>Pick your microphone and watch the level bar move. Sayso shows you how to allow the mic if Windows blocks it.</p></div>
     <div class="card"><span class="n">3</span><b>Choose your apps</b><p>Sayso lists every app on your PC. Switch off the ones where it should never type.</p></div>
   </div>
@@ -106,6 +109,9 @@
 
   <h2>Smarter than dictation</h2>
   <div class="grid">
+    <div class="card"><b>AI on your voice</b><p>"Make that friendlier", "fix the grammar", "write a reply saying I'll be there at 5". Free and private with Ollama on your PC, or your own OpenAI, Claude or Groq key.</p></div>
+    <div class="card"><b>Fits every app</b><p>In a terminal it types lower-case commands with no full stop. In chat apps it skips the final full stop. Pause mid-sentence and it carries on.</p></div>
+    <div class="card"><b>Dictation mode</b><p>"Sayso, start dictation" and just talk, no wake word, until you say "that's all".</p></div>
     <div class="card"><b>Reads like you typed it</b><p>Drops "um" and "uh", adds capitals, and understands "comma", "question mark", "new paragraph".</p></div>
     <div class="card"><b>Knows your words</b><p>Teach it names and terms once: "gear with AI" becomes GearWithAI, every time.</p></div>
     <div class="card"><b>Snippets</b><p>"Sayso, insert my email" types your email, address or sign-off.</p></div>
@@ -122,7 +128,7 @@
   </div>
 
   <h2>What we store</h2>
-  <p>When you sign in to download, we keep your name and email to count downloads. That's all. Your voice and everything Sayso types stay on your PC.</p>
+  <p>Nothing. There's no account. Your voice and everything Sayso types stay on your PC. If you turn on AI with a cloud provider, only the text you ask it to rewrite goes to that provider, with your own key.</p>
 
   <h2>Installing</h2>
   <p>Windows may show <b>"Windows protected your PC"</b> the first time, because Sayso is new and not yet signed. Click <b>More info → Run anyway</b>. The first launch downloads the speech model (about 150&nbsp;MB) once.</p>
@@ -137,6 +143,8 @@
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
   const supabase = createClient("https://laeitoulfslncjyolkpg.supabase.co", "sb_publishable_tOShP6YYGitzaPDhNAUUSQ_pQe3Ph5-");
   const FILE = "https://github.com/gearwithai/sayso/releases/latest/download/SaysoSetup.exe";
+  // Sign-in before download is parked. Flip to true (and turn on Google/GitHub in Supabase Auth) to bring it back.
+  const REQUIRE_SIGNIN = false;
   const $ = (id) => document.getElementById(id);
   const showError = (msg) => { $("err").textContent = msg; $("err").hidden = false; };
 
@@ -145,7 +153,10 @@
   if (hashErr) showError("Sign-in didn't work: " + hashErr);
 
   function render(session) {
+    if (!REQUIRE_SIGNIN) return;
     const user = session?.user;
+    $("direct").hidden = true;
+    $("acct").hidden = !user;
     $("signin").hidden = !!user;
     $("signedin").hidden = !user;
     if (user) $("who").textContent = user.email || user.user_metadata?.user_name || "you";
@@ -166,6 +177,7 @@
   });
 
   $("download").addEventListener("click", async (e) => {
+    if (!REQUIRE_SIGNIN) return;   // plain link straight to the installer
     e.preventDefault();
     const { data: { session } } = await supabase.auth.getSession();
     const u = session?.user;
@@ -179,12 +191,16 @@
     location.href = FILE;
   });
 
-  const { data: { session } } = await supabase.auth.getSession();
-  render(session);
+  if (REQUIRE_SIGNIN) {
+    $("signin").hidden = false;
+    $("signedin").hidden = true;
+    const { data: { session } } = await supabase.auth.getSession();
+    render(session);
+  }
   supabase.rpc("sayso_download_count").then(({ data }) => {
     if (data >= 25) { $("count").textContent = `Used by ${Number(data).toLocaleString()} people`; $("count").hidden = false; }
   });
-  supabase.auth.onAuthStateChange((_evt, s) => render(s));
+  if (REQUIRE_SIGNIN) supabase.auth.onAuthStateChange((_evt, s) => render(s));
 </script>
 </body>
 </html>

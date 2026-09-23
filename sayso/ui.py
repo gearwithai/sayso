@@ -9,6 +9,7 @@ from dataclasses import replace
 import customtkinter as ctk
 
 from sayso import APP_NAME, __version__
+from sayso.ai import PROVIDERS, BY_ID
 from sayso.config import LANGUAGES, PTT_KEYS, STT_MODELS, data_dir
 
 ACCENT = ("#6E56CF", "#8B7BE0")
@@ -21,7 +22,8 @@ STATUS = {
     "loading": ("Getting ready...", "#5B8DEF"),
     "ready": ('Say "{wake}" to start', "#6E56CF"),
     "listening": ("Listening...", "#E5484D"),
-    "thinking": ("Typing...", "#F5A524"),
+    "thinking": ("Working...", "#F5A524"),
+    "dictating": ("Dictation mode - just talk", "#30A46C"),
     "paused": ("Paused", "#9A9A9A"),
     "error": ("Needs attention", "#E5484D"),
 }
@@ -30,6 +32,11 @@ COMMANDS = [
     ("Sayso, hello world", "types \"hello world\""),
     ("Sayso, fix the login bug. Send.", "types it, then presses Enter"),
     ("Sayso", "beep - then say what to type"),
+    ("Sayso, start dictation", "type everything you say, no wake word (\"that's all\" to stop)"),
+    ("Sayso, make that more professional", "AI rewrites the selected text (or what Sayso just typed)"),
+    ("Sayso, translate this to Spanish", "AI translates the selection in place"),
+    ("Sayso, write a reply saying I'll be there at 5", "AI writes it at the cursor (select their message for context)"),
+    ("Sayso, fix the grammar", "AI proofreads the selection"),
     ("Sayso, send", "presses Enter"),
     ("Sayso, new line", "starts a new line"),
     ("Sayso, scratch that", "undoes the last thing"),
@@ -39,6 +46,7 @@ COMMANDS = [
     ("Sayso, new tab", "your own commands (Words tab)"),
     ("Sayso, see you then comma bye", "say punctuation: comma, question mark, new line"),
     ("Hold Right Ctrl and talk", "types when you let go - no wake word"),
+    ("Sayso, what can I say", "opens this list"),
 ]
 
 
@@ -334,6 +342,92 @@ class Wizard(ctk.CTkFrame):
         self.show()
 
 
+class Bubble:
+    """A small pill above the taskbar that shows what Sayso is doing - so you never have to guess.
+    It never takes focus (that would steal your typing), so on Windows it's shown with raw Win32 calls."""
+    SHOW = {"listening", "thinking", "dictating", "error"}
+
+    def __init__(self, root):
+        self.root, self.win, self.hwnd, self._hide_job, self.visible = root, None, 0, None, False
+
+    def build(self):
+        if self.win is not None:
+            return
+        w = ctk.CTkToplevel(self.root)
+        w.overrideredirect(True)
+        w.attributes("-topmost", True)
+        w.configure(fg_color="#1F1D26")
+        f = ctk.CTkFrame(w, fg_color="#1F1D26", corner_radius=0)
+        f.pack(fill="both", expand=True)
+        self.dot = ctk.CTkLabel(f, text="\u25cf", font=font(14), text_color="#E5484D")
+        self.dot.pack(side="left", padx=(14, 6), pady=8)
+        self.text = ctk.CTkLabel(f, text="", font=font(13), text_color="#F4F3F8", wraplength=420, justify="left")
+        self.text.pack(side="left", padx=(0, 16), pady=8)
+        w.bind("<Button-1>", lambda _: self.hide())
+        self.win = w
+        if os.name == "nt":
+            try:
+                import ctypes
+                u = ctypes.windll.user32
+                w.geometry("+-3000+-3000")
+                w.update_idletasks()
+                w.update()
+                self.hwnd = u.GetParent(w.winfo_id()) or w.winfo_id()
+                ex = u.GetWindowLongW(self.hwnd, -20)
+                # WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW (no taskbar button) | WS_EX_TOPMOST
+                u.SetWindowLongW(self.hwnd, -20, ex | 0x08000000 | 0x80 | 0x8)
+                u.ShowWindow(self.hwnd, 0)
+                try:
+                    w.attributes("-alpha", 0.94)
+                except Exception:
+                    pass
+            except Exception:
+                self.hwnd = 0
+        else:
+            w.withdraw()
+
+    def show(self, state: str, msg: str, status: str):
+        try:
+            self.build()
+            if state not in self.SHOW and not (msg and self.visible):
+                return self._later(0.1)
+            color = STATUS.get(state, ("", "#6E56CF"))[1]
+            line = status if state in ("listening", "dictating") or not msg else msg
+            self.dot.configure(text_color=color)
+            self.text.configure(text=line[:140])
+            self.win.update_idletasks()
+            w, h = self.win.winfo_reqwidth(), self.win.winfo_reqheight()
+            sw, sh = self.win.winfo_screenwidth(), self.win.winfo_screenheight()
+            x, y = (sw - w) // 2, sh - h - 90
+            if self.hwnd:
+                import ctypes
+                # HWND_TOPMOST, SWP_NOACTIVATE | SWP_SHOWWINDOW
+                ctypes.windll.user32.SetWindowPos(self.hwnd, -1, x, y, w, h, 0x10 | 0x40)
+            else:
+                self.win.geometry(f"{w}x{h}+{x}+{y}")
+                self.win.deiconify()
+            self.visible = True
+            # stay up while it's working; fade out once there's nothing going on
+            self._later(None if state in ("listening", "thinking", "dictating") else 2.8)
+        except Exception:
+            pass
+
+    def _later(self, secs):
+        if self._hide_job:
+            self.root.after_cancel(self._hide_job)
+            self._hide_job = None
+        if secs is not None:
+            self._hide_job = self.root.after(int(secs * 1000), self.hide)
+
+    def hide(self):
+        self.visible = False
+        if self.hwnd:
+            import ctypes
+            ctypes.windll.user32.ShowWindow(self.hwnd, 0)
+        elif self.win is not None:
+            self.win.withdraw()
+
+
 class MainWindow(ctk.CTk):
     def __init__(self, ctl):
         ctk.set_appearance_mode("system")
@@ -367,7 +461,8 @@ class MainWindow(ctk.CTk):
 
         self.content = ctk.CTkFrame(self, fg_color="transparent")
         self.content.pack(fill="both", expand=True)
-        self.app_list = None
+        self.app_list, self.tabs, self.ai_widgets = None, None, None
+        self.bubble = Bubble(self)
         if ctl.cfg.first_run_done:
             self.build_tabs()
         else:
@@ -384,6 +479,18 @@ class MainWindow(ctk.CTk):
     def hide(self):
         self.withdraw()
 
+    def show_tab(self, name: str):
+        self.show()
+        if self.tabs is not None:
+            try:
+                self.tabs.set(name)
+            except Exception:
+                pass
+
+    def clipboard_set(self, text: str):
+        self.clipboard_clear()
+        self.clipboard_append(text)
+
     def finish_setup(self):
         self.ctl.update_cfg(first_run_done=True)
         for w in self.content.winfo_children():
@@ -397,6 +504,7 @@ class MainWindow(ctk.CTk):
         tabs = ctk.CTkTabview(self.content, fg_color="transparent", segmented_button_selected_color=ACCENT,
                               segmented_button_selected_hover_color=ACCENT_HOVER)
         tabs.pack(fill="both", expand=True, padx=14, pady=(0, 10))
+        self.tabs = tabs
         for name in ("Home", "Apps", "Words", "Settings", "Commands"):
             tabs.add(name)
         self._home(tabs.tab("Home"))
@@ -497,6 +605,14 @@ class MainWindow(ctk.CTk):
         row("Language", lambda r: menu(r, LANGUAGES, cfg.language, "language"))
         switch("Tidy up text (drop \"um\", spoken punctuation, capitals)", "cleanup")
 
+        section("Smart typing")
+        switch("Match the app (terminals, chats, documents)", "smart_format")
+        switch("Carry on a sentence when you pause mid-thought", "smart_continue")
+        switch("Show a status bubble above the taskbar", "show_bubble")
+        switch("Use my NVIDIA graphics card (faster)", "use_gpu")
+
+        self._ai_section(s, section, row)
+
         section("General")
         switch("Beep when Sayso starts listening", "beeps")
         switch("Start Sayso when Windows starts", "launch_at_startup")
@@ -512,6 +628,99 @@ class MainWindow(ctk.CTk):
         ctk.CTkButton(foot, text="Logs", width=60, height=26, font=font(12), fg_color=CARD,
                       text_color=("black", "white"), hover_color=ACCENT_HOVER,
                       command=lambda: os.startfile(data_dir())).pack(side="right")
+
+    def _ai_section(self, s, section, row):
+        ctl, cfg = self.ctl, self.ctl.cfg
+        section("AI voice actions")
+        ctk.CTkLabel(s, text="\"Sayso, make that more professional\", \"translate this to Spanish\",\n"
+                             "\"write a reply saying...\". Free and private with Ollama on this PC,\n"
+                             "or bring your own key. Your key is encrypted by Windows.",
+                     font=font(12), text_color=MUTED, justify="left").pack(anchor="w")
+        choices = {"Automatic (find AI on this PC)": "auto"}
+        choices.update({label: pid for label, (pid, *_rest) in PROVIDERS.items()})
+        widgets = {}
+
+        def pick(label):
+            pid = choices[label]
+            if pid != ctl.cfg.ai_provider:
+                ctl.update_cfg(ai_provider=pid, ai_model="", ai_base_url="")
+            refresh()
+
+        def refresh():
+            pid = ctl.cfg.ai_provider
+            info = BY_ID.get(pid)
+            needs_key = bool(info and info[2])
+            widgets["model"].delete(0, "end")
+            widgets["model"].insert(0, ctl.cfg.ai_model or (info[3] if info else ""))
+            widgets["url"].delete(0, "end")
+            widgets["url"].insert(0, ctl.cfg.ai_base_url or (info[1] if info else ""))
+            widgets["key"].configure(placeholder_text="saved - paste to replace" if ctl.cfg.ai_key else "paste your API key")
+            for w in box.winfo_children():
+                w.pack_forget()
+            if pid not in ("auto", "off"):
+                widgets["model_row"].pack(fill="x", pady=3)
+                widgets["url_row"].pack(fill="x", pady=3)
+            if needs_key:
+                widgets["key_row"].pack(fill="x", pady=3)
+            widgets["buttons"].pack(anchor="w", pady=(6, 0))
+            widgets["status"].pack(anchor="w", pady=(4, 0))
+
+        r = ctk.CTkFrame(s, fg_color="transparent")
+        r.pack(fill="x", pady=(8, 3))
+        ctk.CTkLabel(r, text="AI", font=font(13)).pack(side="left")
+        m = ctk.CTkOptionMenu(r, values=list(choices), width=270, font=font(12), fg_color=ACCENT,
+                              button_color=ACCENT, button_hover_color=ACCENT_HOVER, dynamic_resizing=False,
+                              command=pick)
+        m.set(_label_for(choices, cfg.ai_provider, list(choices)[0]))
+        m.pack(side="right")
+        box = ctk.CTkFrame(s, fg_color="transparent")
+        box.pack(fill="x")
+
+        def field(key, label, commit, show=None):
+            fr = ctk.CTkFrame(box, fg_color="transparent")
+            ctk.CTkLabel(fr, text=label, font=font(13)).pack(side="left")
+            e = ctk.CTkEntry(fr, width=270, font=font(12), show=show)
+            e.pack(side="right")
+            e.bind("<FocusOut>", lambda _: commit(e.get().strip()))
+            e.bind("<Return>", lambda _: commit(e.get().strip()))
+            widgets[key], widgets[key + "_row"] = e, fr
+
+        def set_if_changed(k, v):
+            if v != getattr(ctl.cfg, k):
+                ctl.update_cfg(**{k: v})
+
+        def set_key(v):
+            if v:
+                ctl.set_ai_key(v)
+                widgets["key"].delete(0, "end")
+                widgets["key"].configure(placeholder_text="saved - paste to replace")
+
+        field("model", "Model", lambda v: set_if_changed("ai_model", v))
+        field("url", "Server", lambda v: set_if_changed("ai_base_url", v))
+        field("key", "API key", set_key, show="\u2022")
+
+        b = ctk.CTkFrame(box, fg_color="transparent")
+        status = ctk.CTkLabel(box, text=ctl.ai_status, font=font(12), text_color=MUTED, wraplength=400, justify="left")
+
+        def test():
+            status.configure(text="Testing...")
+            ctl.test_ai(lambda ok, msg: status.configure(text=msg, text_color=("#1E7F4F", "#4CC38A") if ok else "#E5484D"))
+        ctk.CTkButton(b, text="Test", width=80, height=28, font=font(12), fg_color=ACCENT, hover_color=ACCENT_HOVER,
+                      command=test).pack(side="left")
+        ctk.CTkButton(b, text="Get Ollama (free)", width=130, height=28, font=font(12), fg_color=CARD,
+                      text_color=("black", "white"), hover_color=ACCENT_HOVER,
+                      command=lambda: __import__("webbrowser").open("https://ollama.com/download")).pack(side="left", padx=8)
+        ctk.CTkButton(b, text="Look again", width=90, height=28, font=font(12), fg_color=CARD,
+                      text_color=("black", "white"), hover_color=ACCENT_HOVER,
+                      command=lambda: __import__("threading").Thread(target=ctl.setup_ai, daemon=True).start()
+                      ).pack(side="left")
+        widgets["buttons"], widgets["status"] = b, status
+        self.ai_widgets = widgets
+        refresh()
+
+    def ai_changed(self):
+        if self.ai_widgets:
+            self.ai_widgets["status"].configure(text=self.ctl.ai_status, text_color=MUTED)
 
     def _commands(self, t):
         s = ctk.CTkScrollableFrame(t, fg_color="transparent")

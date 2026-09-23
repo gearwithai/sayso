@@ -38,7 +38,8 @@ def _spoken_punctuation(t: str) -> str:
             t = rx.sub(rep + " ", t)
     t = _PERIOD_END.sub(".", t)
     t = re.sub(r"\s+([,.;:?!])", r"\1", t)          # no space before punctuation
-    t = re.sub(r"([,.;:?!])\1+", r"\1", t)           # ",," -> ","
+    t = re.sub(r"([,;:?!])\1+", r"\1", t)            # ",," -> ","
+    t = re.sub(r"(?<!\.)\.\.(?!\.)", ".", t)             # ".." -> "." but "..." stays
     t = re.sub(r"[,;:]([.?!])", r"\1", t)            # ",." -> "."
     t = re.sub(r"[ \t]*\n[ \t]*", "\n", t)
     t = re.sub(r"[ \t]{2,}", " ", t)
@@ -60,7 +61,8 @@ def _capitalize(t: str) -> str:
     return re.sub(r"([.?!]\s+|\n+)([a-z])", lambda m: m.group(1) + m.group(2).upper(), t)
 
 
-def clean(text: str, replacements: dict | None = None, cleanup: bool = True) -> str:
+def clean(text: str, replacements: dict | None = None, cleanup: bool = True, style: str = "normal") -> str:
+    """style: "normal", "chat" (no full stop at the end) or "terminal" (no capitals, no trailing punctuation)."""
     t = text.strip()
     if cleanup:
         t = FILLERS.sub("", t)
@@ -69,5 +71,53 @@ def clean(text: str, replacements: dict | None = None, cleanup: bool = True) -> 
         t = _replacements(t, replacements)
     if cleanup:
         t = re.sub(r"^[\s,.;:]+", "", t)
+        if style == "terminal":
+            t = re.sub(r"[.,;:!?]+$", "", t.strip())
+            # Whisper capitalizes the first word; commands are lower case
+            t = re.sub(r"^([A-Z])([a-z])", lambda m: m.group(1).lower() + m.group(2), t)
+            return t.strip(" ")
         t = _capitalize(t)
+        if style == "chat":
+            t = re.sub(r"(?<![.])\.$", "", t.strip())   # "see you soon." -> "see you soon" (keeps "...")
     return t.strip(" ")
+
+
+# ---------------------------------------------------------------- app-aware style
+
+TERMINALS = {"windowsterminal.exe", "wt.exe", "powershell.exe", "pwsh.exe", "cmd.exe", "conhost.exe",
+             "openconsole.exe", "alacritty.exe", "wezterm-gui.exe", "mintty.exe", "warp.exe", "tabby.exe"}
+CHATS = {"slack.exe", "discord.exe", "teams.exe", "ms-teams.exe", "whatsapp.exe", "whatsapp.root.exe",
+         "telegram.exe", "signal.exe", "messenger.exe", "zoom.exe"}
+
+
+def style_for(exe_name: str) -> str:
+    e = (exe_name or "").lower()
+    if e in TERMINALS:
+        return "terminal"
+    if e in CHATS:
+        return "chat"
+    return "normal"
+
+
+# ---------------------------------------------------------------- mid-sentence continuation
+
+_CONTINUE_WORDS = {
+    "the", "a", "an", "and", "but", "so", "or", "then", "to", "it", "it's", "we", "we're", "you", "you're",
+    "they", "they're", "this", "that", "these", "those", "my", "our", "your", "their", "his", "her", "for",
+    "with", "in", "on", "at", "of", "is", "are", "was", "were", "will", "can", "could", "would", "should",
+    "just", "also", "because", "if", "when", "which", "who", "as", "from", "about", "after", "before",
+    "into", "there", "here", "not", "no", "yes", "all", "some", "more", "maybe", "still", "even", "only",
+}
+
+
+def continue_sentence(text: str, previous: str | None) -> str:
+    """If the last thing typed (in the same window, moments ago) didn't end a sentence,
+    carry on in lower case: "I think" + "The roof is fine" -> "I think the roof is fine"."""
+    if not previous or not text:
+        return text
+    if re.search(r"[.?!:\n]\s*$", previous):
+        return text
+    first = re.match(r"^([A-Z][a-z']*)\b", text)
+    if first and first.group(1).lower() in _CONTINUE_WORDS:
+        return first.group(1).lower() + text[len(first.group(1)):]
+    return text

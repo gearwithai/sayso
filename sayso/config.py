@@ -61,6 +61,14 @@ class Config:
     replacements: dict = field(default_factory=dict)    # said -> typed ("gear with ai" -> "GearWithAI")
     snippets: dict = field(default_factory=dict)        # "insert my email" -> text
     disabled_apps: list = field(default_factory=list)   # AppIDs where Sayso stays quiet
+    smart_format: bool = True           # terminals: no capitals/full stops; chat apps: no full stop
+    smart_continue: bool = True         # carry on a sentence in lower case
+    show_bubble: bool = True            # small live status bubble above the taskbar
+    use_gpu: bool = True                # use an NVIDIA graphics card when possible
+    ai_provider: str = "auto"           # auto (Ollama / LM Studio if running), off, ollama, lmstudio, openai, ...
+    ai_model: str = ""
+    ai_base_url: str = ""
+    ai_key: str = ""                    # encrypted with Windows DPAPI
     words_typed: int = 0                                 # shown on the home screen
 
     @classmethod

@@ -38,3 +38,37 @@ def test_longest_replacement_wins():
 
 def test_replacement_not_inside_words():
     assert clean("the cat in the category", {"cat": "dog"}) == "The dog in the category"
+
+
+from sayso.text import continue_sentence, style_for
+
+
+def test_terminal_style():
+    assert clean("Git status.", style="terminal") == "git status"
+    assert clean("npm run dev", style="terminal") == "npm run dev"
+    assert clean("CD documents.", style="terminal") == "CD documents"   # all-caps word left alone
+
+
+def test_chat_style_drops_final_full_stop_only():
+    assert clean("see you soon.", style="chat") == "See you soon"
+    assert clean("are you coming?", style="chat") == "Are you coming?"
+    assert clean("well...", style="chat") == "Well..."
+
+
+def test_style_for_apps():
+    assert style_for("WindowsTerminal.exe") == "terminal"
+    assert style_for("slack.exe") == "chat"
+    assert style_for("chrome.exe") == "normal"
+    assert style_for("") == "normal"
+
+
+@pytest.mark.parametrize("prev,new,out", [
+    ("I think", "The roof is fine.", "the roof is fine."),
+    ("I think.", "The roof is fine.", "The roof is fine."),
+    ("Call Mike", "And tell him Thursday.", "and tell him Thursday."),
+    ("Meet", "Mike at noon.", "Mike at noon."),          # names keep their capital
+    (None, "The roof.", "The roof."),
+    ("Hi,\n", "Thanks.", "Thanks."),
+])
+def test_continue_sentence(prev, new, out):
+    assert continue_sentence(new, prev) == out

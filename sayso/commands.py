@@ -2,13 +2,16 @@
 import re
 from dataclasses import dataclass
 
+from sayso.ai import parse_intent
+
 # Whisper often hears short commands with filler punctuation or case.
 _TRIM = " .,!?;:\"'"
 
 
 @dataclass(frozen=True)
 class Action:
-    # type, type_send, send, newline, undo, stop, switch, snippet, custom, nothing
+    # type, type_send, send, newline, undo, stop, switch, snippet, custom,
+    # ai_edit, ai_write, dictate_on, dictate_off, ui, nothing
     kind: str
     text: str = ""
 
@@ -23,7 +26,7 @@ def norm(s: str) -> str:
 
 
 def parse(transcript: str, send_word: str = "send", allow_commands: bool = True,
-          snippets: dict | None = None, custom: list | None = None) -> Action:
+          snippets: dict | None = None, custom: list | None = None, ai_ready: bool = True) -> Action:
     raw = re.sub(r"\s+", " ", transcript).strip()
     text = _clean(raw)
     if not text:
@@ -44,11 +47,25 @@ def parse(transcript: str, send_word: str = "send", allow_commands: bool = True,
         return Action("undo")
     if low in ("stop listening", "go to sleep", "pause sayso"):
         return Action("stop")
+    if low in ("start dictation", "dictation mode", "keep listening", "start typing", "dictate"):
+        return Action("dictate_on")
+    if low in ("stop dictation", "stop typing", "end dictation", "that s all", "thats all", "done dictating"):
+        return Action("dictate_off")
+    if low in ("what can i say", "help", "show commands", "list commands", "what can you do"):
+        return Action("ui", "Commands")
+    if low in ("open sayso", "show sayso", "sayso settings", "open sayso settings", "settings"):
+        return Action("ui", "Settings")
 
     # your own voice commands (commands.json) - exact phrase
     for phrase in custom or []:
         if norm(phrase) == low:
             return Action("custom", phrase)
+
+    # "make that more professional", "translate this to Spanish", "write a reply saying ..."
+    intent = parse_intent(low)
+    # "write a note about..." without an AI set up is just dictation; edits say how to turn AI on
+    if intent and (ai_ready or intent.op == "edit"):
+        return Action("ai_edit" if intent.op == "edit" else "ai_write", intent.instruction)
 
     # "insert my email" -> saved snippet
     m = re.match(r"^(?:insert|paste|type out)\s+(?:my\s+|the\s+)?(.+)$", low)

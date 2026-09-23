@@ -25,8 +25,11 @@ GATE_SECS = 2.5              # how much of an utterance we transcribe to look fo
 PREROLL_CHUNKS = 3           # keep 240 ms before speech starts so the first sound isn't clipped
 MIN_UTTERANCE_SECS = 0.3
 
-LOADING, READY, LISTENING, THINKING, PAUSED, ERROR = (
-    "loading", "ready", "listening", "thinking", "paused", "error")
+LOADING, READY, LISTENING, THINKING, PAUSED, ERROR, DICTATING = (
+    "loading", "ready", "listening", "thinking", "paused", "error", "dictating")
+DICTATION_IDLE_SECS = 120      # dictation mode switches itself off after this much quiet
+# what can happen in dictation mode without saying the wake word first
+DICTATION_KINDS = {"type", "type_send", "send", "newline", "undo", "dictate_off"}
 
 
 def rms(chunk: np.ndarray) -> float:
@@ -65,11 +68,24 @@ class Engine(threading.Thread):
         self._loaded_model = None
         self._preroll: list[np.ndarray] = []
         self._ptt_prefix: list[np.ndarray] = []
+        self.dictating = False
+        self._last_speech = time.time()
+        self.device = "cpu"
 
     # ---------- public, thread-safe ----------
     def set_paused(self, paused: bool):
         self.paused = paused
-        self._set_state(PAUSED if paused else READY)
+        if paused:
+            self.dictating = False
+        self._set_state(self._idle_state())
+
+    def set_dictating(self, on: bool, msg: str = ""):
+        self.dictating = on
+        self._last_speech = time.time()
+        if on and self.paused:
+            self.paused = False
+        self._set_state(self._idle_state(), msg or ("Dictation on - just talk. Say \"stop dictation\" when done."
+                                                     if on else "Dictation off"))
 
     def apply_config(self, cfg: Config):
         self.cfg = cfg
@@ -99,7 +115,7 @@ class Engine(threading.Thread):
             log.exception("state callback failed")
 
     def _idle_state(self):
-        return PAUSED if self.paused else READY
+        return PAUSED if self.paused else DICTATING if self.dictating else READY
 
     def _on_audio(self, indata, frames, t, status):
         chunk = indata[:, 0].copy()
@@ -142,8 +158,21 @@ class Engine(threading.Thread):
             return
         self._set_state(LOADING, "Downloading speech model (first run only)...")
         from faster_whisper import WhisperModel
-        self._stt = WhisperModel(self.model_name, device="cpu", compute_type="int8",
-                                 download_root=str(models_dir() / "whisper"))
+        root = str(models_dir() / "whisper")
+        self._stt, self.device = None, "cpu"
+        if getattr(self.cfg, "use_gpu", True):
+            # NVIDIA graphics card: much faster. Falls back to the CPU if CUDA isn't usable.
+            try:
+                import ctranslate2
+                if ctranslate2.get_cuda_device_count() > 0:
+                    stt = WhisperModel(self.model_name, device="cuda", compute_type="float16", download_root=root)
+                    list(stt.transcribe(np.zeros(RATE, dtype=np.float32), language="en")[0])  # warm-up / sanity
+                    self._stt, self.device = stt, "gpu"
+            except Exception as e:
+                log.info("GPU not usable, using CPU: %s", e)
+        if self._stt is None:
+            self._stt = WhisperModel(self.model_name, device="cpu", compute_type="int8", download_root=root)
+        log.info("speech model %s on %s", self.model_name, self.device)
         self._loaded_model = self.model_name
 
     # ---------- audio helpers ----------
@@ -210,13 +239,21 @@ class Engine(threading.Thread):
         return " ".join(s.text for s in segments).strip()
 
     # ---------- acting ----------
-    def _act(self, text: str, allow_commands: bool):
+    def _act(self, text: str, allow_commands: bool, dictation: bool = False):
         action = (self.parser(text, allow_commands) if self.parser
                   else parse(text, self.cfg.send_word, allow_commands=allow_commands))
+        if dictation and action.kind not in DICTATION_KINDS | {"nothing"}:
+            # while dictating, "open Chrome" said without the wake word is just words
+            action = Action("type", text.strip())
         log.info("heard %r -> %s", text, action)
         if action.kind == "stop":
             self.set_paused(True)
             return
+        if action.kind in ("dictate_on", "dictate_off"):
+            self.set_dictating(action.kind == "dictate_on")
+            return
+        if action.kind.startswith("ai_"):
+            self._set_state(THINKING, "Asking AI...")
         if action.kind == "nothing":
             self._set_state(self._idle_state(), "Didn't catch that")
             return
@@ -238,6 +275,21 @@ class Engine(threading.Thread):
         if utt is None or len(utt) < MIN_UTTERANCE_SECS * RATE:
             return
         prompt = f"{cfg.wake_word}."
+
+        if self.dictating:
+            # Dictation mode: everything is typed. "Sayso, ..." still works for commands.
+            self._last_speech = time.time()
+            self._set_state(THINKING)
+            text = self._transcribe(utt, self._vocab_prompt(prompt))
+            woke, rest = wake.match(text, cfg.wake_word)
+            if woke and rest:
+                self._act(rest, allow_commands=True)
+            elif not woke:
+                self._act(text, allow_commands=True, dictation=True)
+            else:
+                self._set_state(self._idle_state())
+            return
+
         gate_len = int(GATE_SECS * RATE)
         gate_text = self._transcribe(utt[:gate_len], prompt)
         woke, rest = wake.match(gate_text, cfg.wake_word)
@@ -312,10 +364,13 @@ class Engine(threading.Thread):
                     time.sleep(0.02)  # leave audio queued so the first words aren't lost
                     continue
 
+                if self.dictating and time.time() - self._last_speech > DICTATION_IDLE_SECS:
+                    self.set_dictating(False, "Dictation ended - it was quiet for 2 minutes")
+
                 chunk = self._next(0.1)
                 if chunk is None:
                     continue
-                if self.paused or not self.cfg.hands_free:
+                if self.paused or not (self.cfg.hands_free or self.dictating):
                     continue
                 if not self._loud(chunk):
                     self._preroll = (self._preroll + [chunk])[-PREROLL_CHUNKS:]

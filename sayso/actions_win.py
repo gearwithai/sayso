@@ -47,6 +47,57 @@ def paste(text: str) -> None:
             pass
 
 
+_SENTINEL = "\u2063sayso-no-selection\u2063"
+
+
+def copy_selection(wait: float = 0.45) -> str:
+    """Ctrl+C the selected text and give it back, leaving the clipboard as it was. "" if nothing is selected."""
+    try:
+        old = pyperclip.paste()
+    except Exception:
+        old = None
+    try:
+        pyperclip.copy(_SENTINEL)
+    except Exception:
+        return ""
+    _tap("c", Key.ctrl)
+    got = ""
+    end = time.time() + wait
+    while time.time() < end:
+        time.sleep(0.04)
+        try:
+            cur = pyperclip.paste()
+        except Exception:
+            continue
+        if cur != _SENTINEL:
+            got = cur
+            break
+    try:
+        pyperclip.copy(old if old is not None else "")
+    except Exception:
+        pass
+    return got.strip()
+
+
+def select_back(chars: int) -> None:
+    """Select the last `chars` characters before the cursor (Shift+Left), so a paste replaces them."""
+    kb.press(Key.shift)
+    try:
+        for _ in range(min(chars, 4000)):
+            kb.press(Key.left)
+            kb.release(Key.left)
+    finally:
+        kb.release(Key.shift)
+
+
+def collapse_selection() -> None:
+    _tap(Key.right)
+
+
+def foreground_hwnd() -> int:
+    return int(user32.GetForegroundWindow() or 0)
+
+
 def _window_exe(hwnd) -> str:
     pid = wintypes.DWORD()
     user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))

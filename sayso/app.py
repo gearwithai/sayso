@@ -1,6 +1,7 @@
 """Entry point: tray icon + engine + window, wired together."""
 import json
 import logging
+import re
 import time
 import queue
 import sys
@@ -18,7 +19,10 @@ log = logging.getLogger("sayso")
 REPO = "gearwithai/sayso"
 DOWNLOAD_PAGE = "https://gearwithai.github.io/sayso/"
 ENGINE_KEYS = {"hands_free", "wake_word", "stt_model", "mic_device", "silence_level", "silence_secs", "send_word",
-               "beeps", "max_secs", "language"}
+               "beeps", "max_secs", "language", "use_gpu"}
+AI_KEYS = {"ai_provider", "ai_model", "ai_base_url", "ai_key"}
+CONTINUE_SECS = 45        # carry a sentence on if you speak again in the same window within this time
+EDIT_LAST_SECS = 300      # "make that more formal" works on what Sayso last typed for this long
 HISTORY_MAX = 50
 
 
@@ -45,9 +49,13 @@ class App:
         from sayso.ui import MainWindow, STATUS
         from sayso.commands import Action, parse
         from sayso.custom import CustomCommands
-        from sayso.text import clean
+        from sayso.text import clean, continue_sentence, style_for
+        from sayso import ai
 
         self.pystray, self.winutil, self.mic_icon, self.apps_mod, self.STATUS = pystray, winutil, mic_icon, apps, STATUS
+        self.ai, self.actions = ai, actions_win
+        self.brain = ai.Brain("off", "", "")
+        self.ai_status = "AI is off"
         self.cfg = Config.load()
         if not self.cfg.first_run_done:
             self._set_autostart(True)  # on by default, so there's nothing to set up again
@@ -62,15 +70,34 @@ class App:
 
         def parser(text, allow_commands):
             return parse(text, self.cfg.send_word, allow_commands=allow_commands,
-                         snippets=self.cfg.snippets, custom=list(self.custom.get()))
+                         snippets=self.cfg.snippets, custom=list(self.custom.get()), ai_ready=self.brain.ready)
 
         def perform(a):
             if a.kind in ("type", "type_send"):
-                a = Action(a.kind, clean(a.text, self.cfg.replacements, self.cfg.cleanup))
-                self._last_typed = a.text
+                exe, hwnd = self._foreground()
+                style = style_for(exe) if self.cfg.smart_format else "normal"
+                text = clean(a.text, self.cfg.replacements, self.cfg.cleanup, style)
+                # did the sentence really end? (chat style hides the final full stop)
+                ended = bool(re.search(r"[.?!:]\s*$", clean(a.text, None, self.cfg.cleanup)))
+                if (self.cfg.smart_continue and style != "terminal" and hwnd == self._last_hwnd
+                        and time.time() - self._last_time < CONTINUE_SECS and not self._last_ended):
+                    text = continue_sentence(text, self._last_typed)
+                a = Action(a.kind, text)
+                msg = actions_win.perform(a, self.apps, self.custom.get())
+                self._remember(text + (" " if a.kind == "type" else ""), hwnd, sent=a.kind == "type_send")
+                self._last_ended = ended
+                return msg
+            if a.kind in ("ai_edit", "ai_write"):
+                return self.run_ai(a)
+            if a.kind == "ui":
+                self.ui(lambda: self.window.show_tab(a.text))
+                return f"Opened {a.text}"
+            if a.kind in ("send", "newline"):
+                self._last_time = 0     # a new message starts fresh
             return actions_win.perform(a, self.apps, self.custom.get())
 
-        self._last_typed = ""
+        self._last_typed, self._last_hwnd, self._last_time, self._last_pasted = "", 0, 0.0, ""
+        self._last_ended = True
         self.engine = Engine(self.cfg, perform,
                              on_state=lambda s, m: self.ui(lambda: self.on_state(s, m)),
                              beep=winutil.beep, allowed=self.allowed, on_typed=self.on_typed, parser=parser)
@@ -109,11 +136,109 @@ class App:
                 log.exception("ui task failed")
         self.window.after(50, self._pump)
 
+    # ---------- typing memory (for "carry on the sentence" and "make that more formal") ----------
+    def _foreground(self):
+        try:
+            exe, _, hwnd = self.apps_mod.foreground()
+            return exe.replace("/", "\\").rsplit("\\", 1)[-1], int(hwnd or 0)
+        except Exception:
+            return "", 0
+
+    def _remember(self, pasted: str, hwnd: int, sent: bool = False):
+        self._last_typed = pasted.rstrip()
+        self._last_pasted = "" if sent else pasted     # after Enter the text is gone from the box
+        self._last_hwnd, self._last_time = hwnd, (0.0 if sent else time.time())
+
+    # ---------- AI voice actions ----------
+    def setup_ai(self):
+        """Build the AI helper from settings. "auto" looks for Ollama / LM Studio running on this PC."""
+        cfg = self.cfg
+        if cfg.ai_provider == "auto":
+            found = self.ai.detect_local()
+            if found:
+                p, base, model = found
+                self.brain = self.ai.Brain(p, base, model)
+                self.ai_status = f"Using {self.ai.BY_ID[p][0].split(' (')[0]} on this PC ({model})"
+            else:
+                self.brain = self.ai.Brain("off", "", "")
+                self.ai_status = "No AI found on this PC. Install Ollama (free) or add an API key."
+        else:
+            p, base, model = self.ai.resolve_config(cfg.ai_provider, cfg.ai_base_url, cfg.ai_model)
+            key = ""
+            if cfg.ai_key:
+                try:
+                    key = self.winutil.unprotect(cfg.ai_key)
+                except Exception:
+                    log.exception("couldn't read the saved API key")
+            self.brain = self.ai.Brain(p, base, model, key)
+            if p == "off":
+                self.ai_status = "AI is off"
+            elif not self.brain.ready:
+                self.ai_status = "Needs an API key" if self.ai.BY_ID[p][2] and not key else "Pick a model"
+            else:
+                self.ai_status = f"Ready: {model}"
+        log.info("AI: %s", self.ai_status)
+        self.ui(lambda: self.window.ai_changed())
+
+    def set_ai_key(self, plain: str):
+        """Keys are encrypted with Windows (DPAPI) before they touch the settings file."""
+        try:
+            enc = self.winutil.protect(plain.strip()) if plain.strip() else ""
+        except Exception:
+            log.exception("couldn't encrypt the API key")
+            return False
+        self.update_cfg(ai_key=enc)
+        return True
+
+    def test_ai(self, done):
+        """Round-trip a tiny prompt; done(ok, message) is called on the UI thread."""
+        def work():
+            try:
+                out = self.brain.complete("Instruction: reply with the single word: ready", timeout=30)
+                ok, msg = True, f"Works! The AI said: {out[:40]}"
+            except self.ai.AIError as e:
+                ok, msg = False, str(e)
+            except Exception as e:
+                ok, msg = False, f"Something went wrong: {e}"
+            self.ui(lambda: done(ok, msg))
+        threading.Thread(target=work, daemon=True, name="ai-test").start()
+
+    def run_ai(self, a):
+        """Runs on the engine thread: grab the text, ask the AI, put the answer where the cursor is."""
+        op = "edit" if a.kind == "ai_edit" else "write"
+        if not self.brain.ready:
+            return "AI isn't set up - open Settings > AI (Ollama is free and private)."
+        exe, hwnd = self._foreground()
+        selected = self.actions.copy_selection()
+        fresh = bool(self._last_pasted) and hwnd == self._last_hwnd and time.time() - self._last_time < EDIT_LAST_SECS
+        source, how = self.ai.choose_source(op, selected, self._last_pasted.rstrip(), fresh)
+        if how not in ("replace_selection", "replace_last", "insert", "insert_after_selection"):
+            return how
+        try:
+            out = self.brain.complete(self.ai.build_prompt(self.ai.Intent(op, a.text), source))
+        except self.ai.AIError as e:
+            return str(e)
+        if not out:
+            return "The AI didn't send anything back."
+        if self._foreground()[1] != hwnd:
+            # you moved on while the AI was thinking - don't type into the wrong window
+            self.ui(lambda: self.window.clipboard_set(out))
+            self.record(out)
+            return "The AI answer is on your clipboard (you switched windows) - press Ctrl+V."
+        if how == "replace_last":
+            self.actions.select_back(len(self._last_pasted))
+        elif how == "insert_after_selection":
+            self.actions.collapse_selection()
+        self.actions.paste(out)
+        self._remember(out, hwnd)
+        self.record(out)
+        return f"AI: {out[:60]}"
+
     # ---------- engine hooks ----------
     def allowed(self, action):
         """Keeps Sayso quiet in apps the user turned off."""
         disabled = set(self.cfg.disabled_apps)
-        if not disabled:
+        if not disabled or action.kind == "ui":
             return None
         if action.kind == "switch":
             app = self.apps_mod.find_app(self.apps, action.text)
@@ -144,7 +269,9 @@ class App:
         self.window.refresh_home()
 
     def on_typed(self, action):
-        text = self._last_typed if action.kind in ("type", "type_send") else action.text
+        self.record(self._last_typed if action.kind in ("type", "type_send") else action.text)
+
+    def record(self, text):
         n = len(text.split())
 
         def save():
@@ -169,6 +296,8 @@ class App:
         self.icon.title = f"{APP_NAME} - {self.status_text()}" + (f"\n{msg[:60]}" if msg else "")
         self.icon.update_menu()
         self.window.update_state(state, msg)
+        if self.cfg.show_bubble:
+            self.window.bubble.show(state, msg, self.status_text())
         if state == "error" and msg:
             self.notify(msg)
 
@@ -196,6 +325,8 @@ class App:
             self._set_autostart(self.cfg.launch_at_startup)
         if "ptt_key" in changes:
             self.ptt.set_key(self.cfg.ptt_key)
+        if AI_KEYS & changes.keys():
+            threading.Thread(target=self.setup_ai, daemon=True, name="ai-setup").start()
         if ENGINE_KEYS & changes.keys():
             self.engine.apply_config(self.cfg)
         else:
@@ -251,11 +382,13 @@ class App:
         self.ptt.start()
         self.rescan_apps()
         threading.Thread(target=self.check_for_update, daemon=True, name="update").start()
+        threading.Thread(target=self.setup_ai, daemon=True, name="ai-setup").start()
         if self.cfg.first_run_done:
             self.window.withdraw()   # already set up: live quietly in the tray
         else:
             self.window.show()
         self.window.after(50, self._pump)
+        self.window.after(200, self.window.bubble.build)   # made up front so it never grabs focus later
         self.window.mainloop()
 
 

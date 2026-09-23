@@ -87,12 +87,12 @@ def test_speech_without_wake_word_is_ignored():
 
 
 def test_long_dictation_transcribes_full_audio():
-    e, performed, _, _, done = make_engine(["Sayso, write a", "Sayso, write a long note about the roof inspection"])
+    e, performed, _, _, done = make_engine(["Sayso, please note", "Sayso, please note the roof inspection is on Thursday"])
     e.start()
     feed(e, [LOUD] * 50 + PAUSE)  # 4 s of speech > 2.5 s gate
     assert done.wait(5)
     e.stop()
-    assert performed[0] == type(performed[0])("type", "write a long note about the roof inspection")
+    assert performed[0] == type(performed[0])("type", "please note the roof inspection is on Thursday")
     gate_len, full_len = e._stt.calls[0][0], e._stt.calls[1][0]
     assert gate_len < full_len
 
@@ -169,3 +169,52 @@ def test_shortcut_while_holding_key_does_not_dictate():
     e.ptt_release()
     assert not done.wait(1)
     e.stop()
+
+
+def test_dictation_mode_types_everything_until_stopped():
+    e, performed, states, _, _ = make_engine(
+        ["Sayso, start dictation.", "The roof is done.", "Open Chrome", "Stop dictation."])
+    e.start()
+    feed(e, [LOUD] * 10 + PAUSE)
+    wait_idle(e)
+    assert e.dictating and states[-1][0] == "dictating"
+    feed(e, [LOUD] * 10 + PAUSE)
+    wait_idle(e)
+    feed(e, [LOUD] * 10 + PAUSE)
+    wait_idle(e)
+    feed(e, [LOUD] * 10 + PAUSE)
+    wait_idle(e)
+    e.stop()
+    assert [(a.kind, a.text) for a in performed] == [("type", "The roof is done."), ("type", "Open Chrome")]
+    assert not e.dictating
+
+
+def test_dictation_mode_still_takes_wake_word_commands():
+    e, performed, _, _, _ = make_engine(["Sayso, start dictation.", "Sayso, open Chrome."])
+    e.start()
+    feed(e, [LOUD] * 10 + PAUSE)
+    wait_idle(e)
+    feed(e, [LOUD] * 10 + PAUSE)
+    wait_idle(e)
+    e.stop()
+    assert performed[0].kind == "switch"
+
+
+def test_dictation_turns_itself_off_when_quiet(monkeypatch):
+    import sayso.engine as eng
+    monkeypatch.setattr(eng, "DICTATION_IDLE_SECS", 0.3)
+    e, _, states, _, _ = make_engine(["Sayso, start dictation."])
+    e.start()
+    feed(e, [LOUD] * 10 + PAUSE)
+    time.sleep(1.5)
+    e.stop()
+    assert not e.dictating and "quiet" in states[-1][1]
+
+
+def test_ai_actions_show_asking_ai():
+    e, performed, states, _, done = make_engine(["Sayso, make this shorter."])
+    e.start()
+    feed(e, [LOUD] * 10 + PAUSE)
+    assert done.wait(5)
+    e.stop()
+    assert performed[0].kind == "ai_edit" and ("thinking", "Asking AI...") in states

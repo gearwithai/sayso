@@ -50,3 +50,39 @@ def beep(high: bool = True) -> None:
 
 def message(title: str, text: str) -> None:
     ctypes.windll.user32.MessageBoxW(None, text, title, 0x40)
+
+
+# ---------------- API keys are stored encrypted with Windows DPAPI (only this Windows user can read them)
+
+class _BLOB(ctypes.Structure):
+    _fields_ = [("cbData", ctypes.c_uint32), ("pbData", ctypes.POINTER(ctypes.c_char))]
+
+
+def protect(secret: str) -> str:
+    import base64
+    if not secret:
+        return ""
+    data = secret.encode("utf-8")
+    inp = _BLOB(len(data), ctypes.cast(ctypes.create_string_buffer(data, len(data)), ctypes.POINTER(ctypes.c_char)))
+    out = _BLOB()
+    if not ctypes.windll.crypt32.CryptProtectData(ctypes.byref(inp), None, None, None, None, 0x1, ctypes.byref(out)):
+        raise OSError("couldn't encrypt the key")
+    try:
+        return base64.b64encode(ctypes.string_at(out.pbData, out.cbData)).decode()
+    finally:
+        ctypes.windll.kernel32.LocalFree(out.pbData)
+
+
+def unprotect(blob: str) -> str:
+    import base64
+    if not blob:
+        return ""
+    data = base64.b64decode(blob)
+    inp = _BLOB(len(data), ctypes.cast(ctypes.create_string_buffer(data, len(data)), ctypes.POINTER(ctypes.c_char)))
+    out = _BLOB()
+    if not ctypes.windll.crypt32.CryptUnprotectData(ctypes.byref(inp), None, None, None, None, 0x1, ctypes.byref(out)):
+        return ""
+    try:
+        return ctypes.string_at(out.pbData, out.cbData).decode("utf-8")
+    finally:
+        ctypes.windll.kernel32.LocalFree(out.pbData)
