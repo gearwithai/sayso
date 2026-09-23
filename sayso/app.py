@@ -1,10 +1,12 @@
-"""Entry point: tray icon + engine + settings, wired together."""
+"""Entry point: tray icon + engine + window, wired together."""
+import json
 import logging
-import os
 import queue
 import sys
 import threading
-import tkinter as tk
+import urllib.request
+import webbrowser
+from dataclasses import replace
 from logging.handlers import RotatingFileHandler
 
 from sayso import APP_NAME, __version__
@@ -12,14 +14,10 @@ from sayso.config import Config, data_dir
 
 log = logging.getLogger("sayso")
 
-STATUS = {
-    "loading": "Getting ready...",
-    "ready": 'Say "{wake}" to start',
-    "listening": "Listening...",
-    "thinking": "Typing...",
-    "paused": "Paused",
-    "error": "Needs attention",
-}
+REPO = "gearwithai/sayso"
+DOWNLOAD_PAGE = "https://gearwithai.github.io/sayso/"
+ENGINE_KEYS = {"hands_free", "wake_word", "stt_model", "mic_device", "silence_level", "silence_secs", "send_word",
+               "beeps", "max_secs"}
 
 
 def setup_logging():
@@ -31,52 +29,53 @@ def setup_logging():
     sys.excepthook = lambda *a: log.critical("crash", exc_info=a)
 
 
+def version_tuple(v: str):
+    return tuple(int(x) for x in v.lstrip("v").split(".") if x.isdigit())
+
+
 class App:
     def __init__(self):
         import pystray
-        from sayso import actions_win, winutil
+        from sayso import actions_win, apps, winutil
         from sayso.engine import Engine
         from sayso.hotkey import PushToTalk
         from sayso.icons import mic_icon
-        from sayso.license import License
+        from sayso.ui import MainWindow, STATUS
 
-        self.pystray, self.winutil, self.mic_icon = pystray, winutil, mic_icon
+        self.pystray, self.winutil, self.mic_icon, self.apps_mod, self.STATUS = pystray, winutil, mic_icon, apps, STATUS
         self.cfg = Config.load()
-        self.cfg.launch_at_startup = winutil.autostart_enabled()  # the installer may have set it
-        self.root = tk.Tk()
-        self.root.withdraw()
+        if not self.cfg.first_run_done:
+            self._set_autostart(True)  # on by default, so there's nothing to set up again
+        else:
+            self.cfg.launch_at_startup = winutil.autostart_enabled()
+        self.apps = apps.load_cached()
+        self.scanning = False
+        self.state, self.last_msg, self.update_url = "loading", "", None
         self._ui: "queue.Queue" = queue.Queue()
-        self.state, self.last_msg = "loading", ""
-        self.settings_open = None
-        self._stop = threading.Event()
 
-        self.license = License(on_change=lambda: self.ui(self.on_license_change))
-        self.engine = Engine(self.cfg, actions_win.perform,
+        self.engine = Engine(self.cfg, lambda a: actions_win.perform(a, self.apps),
                              on_state=lambda s, m: self.ui(lambda: self.on_state(s, m)),
-                             beep=winutil.beep,
-                             allowed=self.license.blocked_reason,
-                             on_typed=self.license.add_words)
+                             beep=winutil.beep, allowed=self.allowed, on_typed=self.on_typed)
         self.ptt = PushToTalk(self.engine)
         self.ptt.set_key(self.cfg.ptt_key)
+        self.window = MainWindow(self)
 
         M = pystray.MenuItem
         self.icon = pystray.Icon(
-            APP_NAME, mic_icon("loading"), f"{APP_NAME} - {STATUS['loading']}",
+            APP_NAME, mic_icon("loading"), APP_NAME,
             menu=pystray.Menu(
+                M(f"Open {APP_NAME}", lambda: self.ui(self.window.show), default=True),
                 M(lambda _: self.status_text(), None, enabled=False),
-                M(lambda _: self.license.summary(), None, enabled=False),
-                M(lambda _: (self.last_msg[:60] or " "), None, enabled=False,
-                  visible=lambda _: bool(self.last_msg)),
                 pystray.Menu.SEPARATOR,
-                M("Pause", lambda: self.ui(self.toggle_pause), checked=lambda _: self.engine.paused),
-                M("Settings...", lambda: self.ui(self.open_settings), default=True),
-                M("How to use", lambda: self.ui(lambda: self.open_settings(welcome=True))),
-                M("Open log folder", lambda: os.startfile(data_dir())),
+                M("Pause", lambda: self.ui(lambda: self.set_paused(not self.engine.paused)),
+                  checked=lambda _: self.engine.paused),
+                M("Update available - download", lambda: webbrowser.open(self.update_url or DOWNLOAD_PAGE),
+                  visible=lambda _: bool(self.update_url)),
                 pystray.Menu.SEPARATOR,
                 M(f"Quit {APP_NAME}", lambda: self.ui(self.quit)),
             ))
 
-    # Everything that touches tkinter must run on the main thread; other threads queue work here.
+    # ---------- threading: tkinter only on the main thread ----------
     def ui(self, fn):
         self._ui.put(fn)
 
@@ -90,10 +89,35 @@ class App:
                 fn()
             except Exception:
                 log.exception("ui task failed")
-        self.root.after(50, self._pump)
+        self.window.after(50, self._pump)
+
+    # ---------- engine hooks ----------
+    def allowed(self, action):
+        """Keeps Sayso quiet in apps the user turned off."""
+        disabled = set(self.cfg.disabled_apps)
+        if not disabled:
+            return None
+        if action.kind == "switch":
+            app = self.apps_mod.find_app(self.apps, action.text)
+            return f"Sayso is turned off for {app.name}" if app and app.id in disabled else None
+        try:
+            exe, title, _ = self.apps_mod.foreground()
+        except Exception:
+            return None
+        app = self.apps_mod.match_foreground(self.apps, exe, title)
+        if app and app.id in disabled:
+            return f"Sayso is turned off in {app.name} - turn it on in the Apps tab"
+        return None
+
+    def on_typed(self, n):
+        def save():
+            self.cfg.words_typed += n
+            self.cfg.save()
+            self.window.refresh_home()
+        self.ui(save)
 
     def status_text(self):
-        return STATUS.get(self.state, self.state).format(wake=self.cfg.wake_word)
+        return self.STATUS.get(self.state, (self.state,))[0].format(wake=self.cfg.wake_word)
 
     def on_state(self, state, msg):
         self.state = state
@@ -102,57 +126,95 @@ class App:
         self.icon.icon = self.mic_icon(state)
         self.icon.title = f"{APP_NAME} - {self.status_text()}" + (f"\n{msg[:60]}" if msg else "")
         self.icon.update_menu()
-        if msg and (state == "error" or msg == self.license.blocked_reason()):
-            self.icon.notify(msg, APP_NAME)
-        if state in ("ready", "paused") and not self.cfg.first_run_done and not self.settings_open:
-            self.open_settings(welcome=True)
+        self.window.update_state(state, msg)
+        if state == "error" and msg:
+            self.notify(msg)
 
-    def toggle_pause(self):
-        self.engine.set_paused(not self.engine.paused)
-
-    def open_settings(self, welcome=False):
-        from sayso.settings_ui import SettingsWindow
-        if self.settings_open and self.settings_open.win.winfo_exists():
-            self.settings_open.win.lift()
-            return
-        self.settings_open = SettingsWindow(self.root, self.cfg, self.engine, self.license,
-                                            self.save_settings, welcome)
-
-    def on_license_change(self):
-        self.icon.update_menu()
-        if self.settings_open:
-            self.settings_open.refresh_account()
-
-    def save_settings(self, new: Config):
+    def notify(self, msg):
         try:
-            self.winutil.set_autostart(new.launch_at_startup)
+            self.icon.notify(msg, APP_NAME)
+        except Exception:
+            pass
+
+    # ---------- used by the window ----------
+    def set_paused(self, paused: bool):
+        self.engine.set_paused(paused)
+        self.icon.update_menu()
+
+    def _set_autostart(self, on: bool):
+        try:
+            self.winutil.set_autostart(on)
         except Exception:
             log.exception("autostart change failed")
-        new.save()
-        self.cfg = new
-        self.ptt.set_key(new.ptt_key)
-        self.engine.apply_config(new)
-        log.info("settings saved: %s", new)
+
+    def update_cfg(self, **changes):
+        self.cfg = replace(self.cfg, **changes)
+        self.cfg.save()
+        if "launch_at_startup" in changes:
+            self._set_autostart(self.cfg.launch_at_startup)
+        if "ptt_key" in changes:
+            self.ptt.set_key(self.cfg.ptt_key)
+        if ENGINE_KEYS & changes.keys():
+            self.engine.apply_config(self.cfg)
+        else:
+            self.engine.cfg = self.cfg
+        log.info("settings changed: %s", changes)
+
+    def set_app_enabled(self, app_id: str, on: bool):
+        disabled = [a for a in self.cfg.disabled_apps if a != app_id]
+        if not on:
+            disabled.append(app_id)
+        self.update_cfg(disabled_apps=disabled)
+
+    def set_all_apps_enabled(self, on: bool):
+        self.update_cfg(disabled_apps=[] if on else [a.id for a in self.apps])
+
+    def rescan_apps(self):
+        if self.scanning:
+            return
+        self.scanning = True
+        self.window.apps_changed()
+
+        def work():
+            found = self.apps_mod.scan()
+
+            def done():
+                self.scanning = False
+                if found:
+                    self.apps = found
+                self.window.apps_changed()
+            self.ui(done)
+        threading.Thread(target=work, daemon=True, name="app-scan").start()
+
+    def check_for_update(self):
+        try:
+            req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/releases/latest",
+                                         headers={"Accept": "application/vnd.github+json"})
+            with urllib.request.urlopen(req, timeout=10) as r:
+                latest = json.loads(r.read()).get("tag_name", "")
+            if latest and version_tuple(latest) > version_tuple(__version__):
+                self.update_url = DOWNLOAD_PAGE
+                self.ui(lambda: (self.icon.update_menu(), self.notify(f"Sayso {latest} is available.")))
+        except Exception as e:
+            log.info("update check skipped: %s", e)
 
     def quit(self):
-        self._stop.set()
-        if self.license.unsynced:
-            try:
-                self.license.sync()  # don't lose the last few words' count
-            except Exception:
-                pass
         self.engine.stop()
         self.icon.stop()
-        self.root.quit()
+        self.window.quit()
 
     def run(self):
         threading.Thread(target=self.icon.run, daemon=True, name="tray").start()
         self.engine.start()
         self.ptt.start()
-        threading.Thread(target=self.license.run_background_sync, args=(self._stop,),
-                         daemon=True, name="license").start()
-        self.root.after(50, self._pump)
-        self.root.mainloop()
+        self.rescan_apps()
+        threading.Thread(target=self.check_for_update, daemon=True, name="update").start()
+        if self.cfg.first_run_done:
+            self.window.withdraw()   # already set up: live quietly in the tray
+        else:
+            self.window.show()
+        self.window.after(50, self._pump)
+        self.window.mainloop()
 
 
 def main():
@@ -160,6 +222,6 @@ def main():
     log.info("%s %s starting", APP_NAME, __version__)
     from sayso import winutil
     if winutil.already_running():
-        winutil.message(APP_NAME, f"{APP_NAME} is already running - look for the microphone icon by the clock.")
+        winutil.message(APP_NAME, f"{APP_NAME} is already running - click the microphone icon by the clock.")
         return
     App().run()

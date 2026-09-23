@@ -41,15 +41,15 @@ def count_words(action: Action) -> int:
 class Engine(threading.Thread):
     def __init__(self, cfg: Config, perform: Callable[[Action], str],
                  on_state: Callable[[str, str], None], beep: Callable[[bool], None],
-                 allowed: Callable[[], str | None] = lambda: None,
+                 allowed: Callable[[Action], str | None] = lambda a: None,
                  on_typed: Callable[[int], None] = lambda n: None):
         super().__init__(daemon=True, name="sayso-engine")
         self.cfg = cfg
         self.perform = perform
         self.on_state = on_state
         self.beep = beep
-        self.allowed = allowed          # returns a reason string when typing is blocked (e.g. trial used up)
-        self.on_typed = on_typed        # word counter for usage
+        self.allowed = allowed          # returns a reason string when an action is blocked (e.g. app turned off)
+        self.on_typed = on_typed        # word counter (stats)
         self.audio: "queue.Queue[np.ndarray]" = queue.Queue(maxsize=600)
         self.level = 0.0
         self.state = LOADING
@@ -202,11 +202,10 @@ class Engine(threading.Thread):
             self._set_state(self._idle_state(), "Didn't catch that")
             return
         words = count_words(action)
-        if words:
-            blocked = self.allowed()
-            if blocked:
-                self._set_state(self._idle_state(), blocked)
-                return
+        blocked = self.allowed(action)
+        if blocked:
+            self._set_state(self._idle_state(), blocked)
+            return
         msg = self.perform(action)
         if words:
             self.on_typed(words)

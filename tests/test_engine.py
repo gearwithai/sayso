@@ -23,7 +23,7 @@ class FakeSTT:
         return [type("S", (), {"text": text})], None
 
 
-def make_engine(texts, allowed=lambda: None, **cfg):
+def make_engine(texts, allowed=lambda a: None, **cfg):
     done = threading.Event()
     performed, states, typed = [], [], []
 
@@ -73,7 +73,7 @@ def test_wake_then_command():
     feed(e, [LOUD] * 8 + PAUSE)
     assert done.wait(5)
     e.stop()
-    assert performed[0].kind == "switch" and performed[0].text == "Chrome"
+    assert performed[0].kind == "switch" and performed[0].text == "chrome"
     assert ("listening", "") in states
 
 
@@ -119,9 +119,11 @@ def test_stop_listening_pauses():
     assert e.paused and performed == [] and states[-1][0] == "paused"
 
 
-def test_trial_used_up_blocks_typing_but_not_commands():
+def test_blocked_app_stops_typing_but_not_switching():
+    def allowed(a):
+        return "Sayso is off in Notepad" if a.kind != "switch" else None
     e, performed, states, typed, done = make_engine(
-        ["Sayso, hello world", "Sayso, open Chrome"], allowed=lambda: "Free trial used up")
+        ["Sayso, hello world", "Sayso, open Chrome"], allowed=allowed)
     e.start()
     feed(e, [LOUD] * 10 + PAUSE)
     wait_idle(e)
@@ -129,7 +131,7 @@ def test_trial_used_up_blocks_typing_but_not_commands():
     assert done.wait(5)
     e.stop()
     assert [a.kind for a in performed] == ["switch"]
-    assert any(m == "Free trial used up" for _, m in states)
+    assert any(m == "Sayso is off in Notepad" for _, m in states)
     assert typed == []
 
 

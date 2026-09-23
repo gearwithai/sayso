@@ -2,23 +2,6 @@
 import re
 from dataclasses import dataclass
 
-APP_ALIASES = {
-    "vs code": "Visual Studio Code",
-    "vscode": "Visual Studio Code",
-    "code": "Visual Studio Code",
-    "terminal": "PowerShell",
-    "powershell": "PowerShell",
-    "chrome": "Chrome",
-    "google chrome": "Chrome",
-    "edge": "Edge",
-    "cursor": "Cursor",
-    "claude": "Claude",
-    "notepad": "Notepad",
-    "outlook": "Outlook",
-    "excel": "Excel",
-    "word": "Word",
-    "slack": "Slack",
-}
 
 # Whisper often hears short commands with filler punctuation or case.
 _TRIM = " .,!?;:\"'"
@@ -56,7 +39,7 @@ def parse(transcript: str, send_word: str = "send", allow_commands: bool = True)
     m = re.match(r"^(?:open|switch to|go to)\s+(.+)$", low)
     if m:
         target = _clean(m.group(1))
-        return Action("switch", APP_ALIASES.get(target, target))
+        return Action("switch", target)
 
     # "...and run the tests, send" -> type the body, then press Enter
     m = re.match(rf"^(.*\S)[\s,.;:!?]+{re.escape(sw)}$", text, flags=re.IGNORECASE)

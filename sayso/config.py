@@ -1,7 +1,7 @@
 """Settings, stored as JSON in %APPDATA%\\Sayso\\config.json."""
 import json
 import os
-from dataclasses import dataclass, asdict, fields
+from dataclasses import dataclass, asdict, field, fields
 from pathlib import Path
 
 from sayso import APP_NAME
@@ -49,8 +49,10 @@ class Config:
     max_secs: float = 45.0
     send_word: str = "send"             # "...fix the tests send" -> type + Enter
     beeps: bool = True
-    launch_at_startup: bool = False
+    launch_at_startup: bool = True
     first_run_done: bool = False
+    disabled_apps: list = field(default_factory=list)   # AppIDs where Sayso stays quiet
+    words_typed: int = 0                                 # shown on the home screen
 
     @classmethod
     def load(cls) -> "Config":

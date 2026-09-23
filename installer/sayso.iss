@@ -1,5 +1,7 @@
 ; Inno Setup script - builds SaysoSetup.exe from the PyInstaller output in dist\Sayso
-#define AppVersion "0.2.0"
+#ifndef AppVersion
+  #define AppVersion "0.3.0"
+#endif
 
 [Setup]
 AppId={{8F3C2A1E-5B7D-4E9A-9C1F-5A7E2D3B4C60}
@@ -13,18 +15,20 @@ DisableDirPage=yes
 ; Per-user install: no admin prompt
 PrivilegesRequired=lowest
 OutputDir=..\dist
-OutputBaseFilename=SaysoSetup-{#AppVersion}
+OutputBaseFilename=SaysoSetup
 SetupIconFile=..\sayso\sayso.ico
 UninstallDisplayIcon={app}\Sayso.exe
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
+DisableWelcomePage=yes
+DisableReadyPage=yes
+AppPublisherURL=https://gearwithai.github.io/sayso/
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=yes
 
 [Tasks]
-Name: "startup"; Description: "Start Sayso when Windows starts"; GroupDescription: "Options:"
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Options:"; Flags: unchecked
 
 [Files]
@@ -33,10 +37,6 @@ Source: "..\dist\Sayso\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
 [Icons]
 Name: "{group}\Sayso"; Filename: "{app}\Sayso.exe"
 Name: "{autodesktop}\Sayso"; Filename: "{app}\Sayso.exe"; Tasks: desktopicon
-
-[Registry]
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Sayso"; \
-  ValueData: """{app}\Sayso.exe"""; Tasks: startup; Flags: uninsdeletevalue
 
 [Run]
 Filename: "{app}\Sayso.exe"; Description: "Launch Sayso now"; Flags: nowait postinstall skipifsilent
@@ -47,3 +47,10 @@ Filename: "taskkill"; Parameters: "/IM Sayso.exe /F"; Flags: runhidden; RunOnceI
 [UninstallDelete]
 ; Settings and downloaded models live in %APPDATA%\Sayso
 Type: filesandordirs; Name: "{userappdata}\Sayso"
+
+[Code]
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usPostUninstall then
+    RegDeleteValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Run', 'Sayso');
+end;

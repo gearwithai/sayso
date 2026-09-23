@@ -3,8 +3,12 @@ name: build
 on:
   push:
     branches: [main]
-    tags: ["v*"]
+  release:
+    types: [published]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   windows:
@@ -20,14 +24,15 @@ jobs:
       - run: pyinstaller --noconfirm --clean sayso.spec
       - name: Build installer
         run: |
+          $v = python -c "import sayso; print(sayso.__version__)"
           choco install innosetup -y --no-progress
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\sayso.iss
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=$v installer\sayso.iss
       - uses: actions/upload-artifact@v4
         with:
           name: SaysoSetup
-          path: dist/SaysoSetup-*.exe
-      - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
+          path: dist/SaysoSetup.exe
+      - name: Attach installer to the release
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/SaysoSetup-*.exe
+          files: dist/SaysoSetup.exe

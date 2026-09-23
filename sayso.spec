@@ -2,6 +2,7 @@
 from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs, collect_submodules
 
 datas = collect_data_files("faster_whisper")          # includes the VAD model it needs
+datas += collect_data_files("customtkinter")
 datas += [("sayso/sayso.ico", "sayso")]
 binaries = collect_dynamic_libs("ctranslate2") + collect_dynamic_libs("onnxruntime")  # onnxruntime: VAD
 hidden = collect_submodules("pystray") + collect_submodules("pynput") + ["sounddevice"]

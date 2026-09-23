@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sayso - type anywhere with your voice</title>
+<meta name="description" content="Sayso is a free Windows app: say &quot;Sayso&quot;, then talk, and your words appear in any app. Runs on your PC - your voice is never uploaded.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%236E56CF'/%3E%3Crect x='24' y='12' width='16' height='26' rx='8' fill='white'/%3E%3Cpath d='M17 33a15 13 0 0 0 30 0' stroke='white' stroke-width='3' fill='none'/%3E%3Cpath d='M32 46v6M25 52h14' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #fbfaff; --fg: #17151f; --muted: #5f5b6e; --card: #f1eff8; --line: #e3e0ee;
+    --accent: #6e56cf; --accent-2: #5b45b8; --ok: #1f9d55;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111016; --fg: #f1eff8; --muted: #a19db2; --card: #1c1a24; --line: #2c2936;
+            --accent: #8b7be0; --accent-2: #9d8fe8; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 17px/1.55 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+  main { max-width: 880px; margin: 0 auto; padding: 0 20px 64px; }
+  header { display: flex; align-items: center; gap: 10px; padding: 22px 0; font-weight: 700; font-size: 20px; }
+  header svg { width: 32px; height: 32px; }
+  header a { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--muted); text-decoration: none; }
+  .hero { padding: 48px 0 24px; }
+  h1 { font-size: clamp(36px, 7vw, 60px); line-height: 1.05; margin: 0 0 18px; letter-spacing: -0.02em; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lead { font-size: 20px; color: var(--muted); max-width: 620px; margin: 0 0 30px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #fff;
+         padding: 15px 26px; border-radius: 12px; font-weight: 650; font-size: 18px; text-decoration: none; }
+  .btn:hover { background: var(--accent-2); }
+  .small { font-size: 14px; color: var(--muted); margin-top: 12px; }
+  .say { margin: 44px 0; padding: 26px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+  .say .q { font-size: 22px; font-weight: 650; }
+  .say .a { color: var(--muted); }
+  .say .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 10px 0;
+              border-bottom: 1px solid var(--line); }
+  .say .row:last-child { border-bottom: 0; }
+  h2 { font-size: 28px; margin: 56px 0 16px; letter-spacing: -0.01em; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card b { display: block; font-size: 18px; margin-bottom: 4px; }
+  .card p { margin: 0; color: var(--muted); }
+  .n { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+       background: var(--accent); color: #fff; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+  .note { border-left: 4px solid var(--accent); padding: 12px 16px; background: var(--card); border-radius: 8px;
+          color: var(--muted); margin-top: 16px; }
+  footer { margin-top: 64px; color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#6E56CF"/><rect x="24" y="12" width="16" height="26" rx="8" fill="#fff"/><path d="M17 33a15 13 0 0 0 30 0" stroke="#fff" stroke-width="3" fill="none"/><path d="M32 46v6M25 52h14" stroke="#fff" stroke-width="3"/></svg>
+    Sayso
+    <a href="https://github.com/gearwithai/sayso">Source code</a>
+  </header>
+
+  <section class="hero">
+    <h1>Type anywhere<br>with your <em>voice</em>.</h1>
+    <p class="lead">Say "Sayso", then talk. Your words appear in whatever app you're in: email, chat, docs, code editors, AI assistants. Free, and it runs on your own PC.</p>
+    <a class="btn" href="https://github.com/gearwithai/sayso/releases/latest/download/SaysoSetup.exe">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M6 11l6 6 6-6M4 21h16"/></svg>
+      Download for Windows
+    </a>
+    <p class="small">Free · Windows 10 and 11 (64-bit) · no account needed</p>
+  </section>
+
+  <section class="say" aria-label="Examples">
+    <div class="row"><span class="q">"Sayso, hello world"</span><span class="a">types "hello world"</span></div>
+    <div class="row"><span class="q">"Sayso, fix the login bug. Send."</span><span class="a">types it and presses Enter</span></div>
+    <div class="row"><span class="q">"Sayso, open Chrome"</span><span class="a">switches to or opens the app</span></div>
+    <div class="row"><span class="q">Hold Right Ctrl and talk</span><span class="a">types when you let go</span></div>
+  </section>
+
+  <h2>Set up once, in a minute</h2>
+  <div class="grid">
+    <div class="card"><span class="n">1</span><b>Download and install</b><p>Run SaysoSetup.exe. No admin rights, no account.</p></div>
+    <div class="card"><span class="n">2</span><b>Check your mic</b><p>Pick your microphone and watch the level bar move. Sayso shows you how to allow the mic if Windows blocks it.</p></div>
+    <div class="card"><span class="n">3</span><b>Choose your apps</b><p>Sayso lists every app on your PC. Switch off the ones where it should never type.</p></div>
+  </div>
+  <p class="note">After that there's nothing to set up again. Sayso starts with Windows and waits by the clock. Click the microphone icon any time to change things.</p>
+
+  <h2>Private by design</h2>
+  <div class="grid">
+    <div class="card"><b>Your voice stays on your PC</b><p>Speech is turned into text on your own computer. Nothing you say is uploaded.</p></div>
+    <div class="card"><b>Only listens for its name</b><p>It ignores everything until a phrase starts with "Sayso". You can pause it any time.</p></div>
+    <div class="card"><b>You choose where it types</b><p>Turn Sayso off for any app, such as your banking app or a game.</p></div>
+  </div>
+
+  <h2>Installing</h2>
+  <p>Windows may show <b>"Windows protected your PC"</b> the first time, because Sayso is new and not yet signed. Click <b>More info → Run anyway</b>. The first launch downloads the speech model (about 150&nbsp;MB) once.</p>
+
+  <footer>
+    <span>Sayso is free and open source, made by GearWithAI.</span>
+    <a href="https://github.com/gearwithai/sayso/releases">All versions</a>
+    <a href="https://github.com/gearwithai/sayso/issues">Report a problem</a>
+  </footer>
+</main>
+</body>
+</html>

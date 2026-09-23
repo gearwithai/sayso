@@ -1,58 +1,43 @@
 # Sayso
 
-Hands-free voice typing for Windows. Say **"Sayso"**, then what you want typed, and it appears in whatever app is in front.
-Your voice is processed on your own PC. Only the word count for the free trial goes to the cloud.
+**Type anywhere with your voice. Free for Windows.**
+Say "Sayso", then talk, and your words appear in whatever app is in front. Speech is processed on your own PC.
+
+**Download:** https://gearwithai.github.io/sayso/ (or [the latest release](https://github.com/gearwithai/sayso/releases/latest))
 
 ## Using it
 - **"Sayso, hello world"**: types "hello world".
 - **"Sayso, fix the login bug. Send."**: types it and presses Enter.
-- **"Sayso"** on its own → beep → say your text or a command.
-- Commands after "Sayso": **send**, **new line**, **scratch that** (undo), **open Chrome** / **switch to VS Code**, **stop listening**.
-- **Hold Right Ctrl** and talk: types plain text when you let go (no wake word needed).
-- The wake word can be changed in Settings (any word works).
+- **"Sayso"** on its own → beep → say what to type or a command.
+- After "Sayso": **send**, **new line**, **scratch that** (undo), **open Chrome** / **switch to VS Code**, **stop listening**.
+- **Hold Right Ctrl** and talk: types plain text when you let go.
 
-Tray icon: purple = waiting, red = listening, amber = typing, gray = paused, blue = loading.
+The first launch walks through a one-time setup: pick the mic, choose which apps Sayso may type into, try it.
+After that it starts with Windows and lives by the clock; click the tray icon to open the window
+(Home · Apps · Settings · Commands). Everything saves as you change it.
 
-## How it's built
+## How it works
 ```
-Sayso.exe (on the user's PC)                Cloud
-┌──────────────────────────────┐            ┌───────────────────────────────┐
-│ mic → Whisper (local) →      │  words     │ Supabase edge function        │
-│ "Sayso …" → type into app    │  count ──▶ │ sayso-api: trial, license keys│
-└──────────────────────────────┘            │ Postgres: devices, licenses   │
-                                            └───────────────────────────────┘
-GitHub: code + Actions builds the installer on every push, Releases host the download.
+mic → speech detected → Whisper (on this PC) transcribes the first 2.5 s
+    → starts with "Sayso"? → command or text → typed into the app in front (if that app is on)
 ```
+- `sayso/engine.py`: listening loop (wake word, hold-to-talk)
+- `sayso/wake.py`: fuzzy match of the wake word ("Say so", "Say-so", ...)
+- `sayso/commands.py`: transcript → action
+- `sayso/apps.py`: installed apps from the Start menu, per-app on/off, open apps by name
+- `sayso/actions_win.py`: paste, keys, switch windows
+- `sayso/ui.py`: the window (customtkinter)
+- `sayso/app.py`: tray icon, settings, update check
 
-| Part | Where |
-|---|---|
-| Source code | this repo |
-| Installer builds | GitHub Actions → `.github/workflows/build.yml` |
-| Download | GitHub Releases (tag `v0.2.0` → `SaysoSetup-0.2.0.exe`) |
-| Trial + licenses | Supabase project **Sayso** (`laeitoulfslncjyolkpg`), function `sayso-api`, SQL in `supabase/` |
-| On the user's PC | app in `%LOCALAPPDATA%\Programs\Sayso`, settings/models/log in `%APPDATA%\Sayso` |
+Settings, the speech model and logs live in `%APPDATA%\Sayso`. The app installs per-user to `%LOCALAPPDATA%\Programs\Sayso`.
 
-## Issuing a license key (until payments are wired up)
-In Supabase → SQL editor:
-```sql
-insert into licenses (key, email, seats, source) values ('SAYSO-XXXX-XXXX-XXXX', 'customer@email.com', 3, 'manual');
-```
-The customer pastes the key into Settings → Account → Activate.
+## Releasing a new version
+1. Bump `__version__` in `sayso/__init__.py`.
+2. On GitHub: Releases → Draft a new release → tag `v0.x.y` → Publish.
+3. Actions builds the installer and attaches `SaysoSetup.exe` to the release. The download page always points at the latest one.
+Installed copies see the new version and offer the update from the tray menu.
 
 ## Developing
-- `run_dev.bat`: run from source (needs Python 3.11).
-- `build.bat`: build `Sayso.exe` locally (and the installer if Inno Setup 6 is installed).
+- `run_dev.bat`: run from source (Python 3.11).
+- `build.bat`: build the app and installer locally (installer needs Inno Setup 6).
 - `python -m pytest`: tests (no mic or Windows needed).
-
-| File | What it does |
-|---|---|
-| `sayso/engine.py` | Mic → detect speech → wake word check → transcribe → act |
-| `sayso/wake.py` | Fuzzy match of the wake word at the start of what was said |
-| `sayso/commands.py` | Turns a transcript into an action ("send", "open X", …) |
-| `sayso/actions_win.py` | Paste, keys, window switching |
-| `sayso/license.py` | Trial / license client, offline-friendly |
-| `sayso/app.py` | Tray icon and wiring |
-| `sayso/settings_ui.py` | Settings + welcome window |
-
-## Not built yet
-Payments (Stripe checkout → license key email), auto-update, code signing, website, Mac.

@@ -1,16 +1,17 @@
-"""Windows side effects: paste text, press keys, switch windows."""
+"""Windows side effects: paste text, press keys, switch to / open apps."""
 import ctypes
-import subprocess
 import time
 from ctypes import wintypes
 
 import pyperclip
 from pynput.keyboard import Controller, Key
 
+from sayso import apps as apps_mod
 from sayso.commands import Action
 
 kb = Controller()
 user32 = ctypes.windll.user32
+kernel32 = ctypes.windll.kernel32
 
 VK_MENU = 0x12
 KEYEVENTF_KEYUP = 0x0002
@@ -27,7 +28,7 @@ def _tap(key, *mods):
 
 
 def paste(text: str) -> None:
-    """Paste via clipboard - instant and handles any characters. Restores the old clipboard text."""
+    """Paste via the clipboard - instant and handles any characters. Restores the old clipboard text."""
     try:
         old = pyperclip.paste()
     except Exception:
@@ -41,6 +42,20 @@ def paste(text: str) -> None:
             pyperclip.copy(old)
         except Exception:
             pass
+
+
+def _window_exe(hwnd) -> str:
+    pid = wintypes.DWORD()
+    user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    h = kernel32.OpenProcess(0x1000, False, pid.value)
+    if not h:
+        return ""
+    try:
+        size = wintypes.DWORD(1024)
+        buf = ctypes.create_unicode_buffer(1024)
+        return buf.value if kernel32.QueryFullProcessImageNameW(h, 0, buf, ctypes.byref(size)) else ""
+    finally:
+        kernel32.CloseHandle(h)
 
 
 def _windows():
@@ -60,24 +75,33 @@ def _windows():
     return found
 
 
-def switch_to(name: str) -> str:
-    target = name.lower()
+def _focus(hwnd):
+    if user32.IsIconic(hwnd):
+        user32.ShowWindow(hwnd, SW_RESTORE)
+    # Windows only lets the foreground app change focus; a synthetic Alt tap unlocks it.
+    user32.keybd_event(VK_MENU, 0, 0, 0)
+    user32.SetForegroundWindow(hwnd)
+    user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
+
+
+def switch_to(spoken: str, app_list: list) -> str:
+    app = apps_mod.find_app(app_list, spoken)
+    if app:
+        for hwnd, title in _windows():
+            if apps_mod.match_foreground([app], _window_exe(hwnd), title):
+                _focus(hwnd)
+                return f"Switched to {app.name}"
+        apps_mod.launch(app)
+        return f"Opening {app.name}"
+    # Not an installed app we know - try any open window with that name
     for hwnd, title in _windows():
-        if target in title.lower():
-            if user32.IsIconic(hwnd):
-                user32.ShowWindow(hwnd, SW_RESTORE)
-            # Windows only lets the foreground app change focus; a synthetic Alt tap unlocks it.
-            user32.keybd_event(VK_MENU, 0, 0, 0)
-            user32.SetForegroundWindow(hwnd)
-            user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
+        if spoken.lower() in title.lower():
+            _focus(hwnd)
             return f"Switched to {title}"
-    # Not open: let Windows try to launch it (works for chrome, msedge, notepad, code, ...)
-    exe = {"visual studio code": "code", "edge": "msedge", "powershell": "powershell"}.get(target, target)
-    subprocess.Popen(["cmd", "/c", "start", "", exe], creationflags=0x08000000)  # CREATE_NO_WINDOW
-    return f"Opening {name}"
+    return f"Couldn't find an app called {spoken}"
 
 
-def perform(action: Action) -> str:
+def perform(action: Action, app_list: list) -> str:
     k = action.kind
     if k == "type":
         paste(action.text + " ")
@@ -97,5 +121,5 @@ def perform(action: Action) -> str:
         _tap("z", Key.ctrl)
         return "Undo"
     if k == "switch":
-        return switch_to(action.text)
+        return switch_to(action.text, app_list)
     return ""
