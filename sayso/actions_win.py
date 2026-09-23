@@ -1,0 +1,101 @@
+"""Windows side effects: paste text, press keys, switch windows."""
+import ctypes
+import subprocess
+import time
+from ctypes import wintypes
+
+import pyperclip
+from pynput.keyboard import Controller, Key
+
+from sayso.commands import Action
+
+kb = Controller()
+user32 = ctypes.windll.user32
+
+VK_MENU = 0x12
+KEYEVENTF_KEYUP = 0x0002
+SW_RESTORE = 9
+
+
+def _tap(key, *mods):
+    for m in mods:
+        kb.press(m)
+    kb.press(key)
+    kb.release(key)
+    for m in reversed(mods):
+        kb.release(m)
+
+
+def paste(text: str) -> None:
+    """Paste via clipboard - instant and handles any characters. Restores the old clipboard text."""
+    try:
+        old = pyperclip.paste()
+    except Exception:
+        old = None
+    pyperclip.copy(text)
+    time.sleep(0.03)
+    _tap("v", Key.ctrl)
+    time.sleep(0.2)  # let the target app read the clipboard before restoring
+    if old is not None:
+        try:
+            pyperclip.copy(old)
+        except Exception:
+            pass
+
+
+def _windows():
+    found = []
+
+    @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+    def cb(hwnd, _):
+        if user32.IsWindowVisible(hwnd):
+            n = user32.GetWindowTextLengthW(hwnd)
+            if n:
+                buf = ctypes.create_unicode_buffer(n + 1)
+                user32.GetWindowTextW(hwnd, buf, n + 1)
+                found.append((hwnd, buf.value))
+        return True
+
+    user32.EnumWindows(cb, 0)
+    return found
+
+
+def switch_to(name: str) -> str:
+    target = name.lower()
+    for hwnd, title in _windows():
+        if target in title.lower():
+            if user32.IsIconic(hwnd):
+                user32.ShowWindow(hwnd, SW_RESTORE)
+            # Windows only lets the foreground app change focus; a synthetic Alt tap unlocks it.
+            user32.keybd_event(VK_MENU, 0, 0, 0)
+            user32.SetForegroundWindow(hwnd)
+            user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
+            return f"Switched to {title}"
+    # Not open: let Windows try to launch it (works for chrome, msedge, notepad, code, ...)
+    exe = {"visual studio code": "code", "edge": "msedge", "powershell": "powershell"}.get(target, target)
+    subprocess.Popen(["cmd", "/c", "start", "", exe], creationflags=0x08000000)  # CREATE_NO_WINDOW
+    return f"Opening {name}"
+
+
+def perform(action: Action) -> str:
+    k = action.kind
+    if k == "type":
+        paste(action.text + " ")
+        return f"Typed: {action.text}"
+    if k == "type_send":
+        paste(action.text)
+        time.sleep(0.1)
+        _tap(Key.enter)
+        return f"Sent: {action.text}"
+    if k == "send":
+        _tap(Key.enter)
+        return "Pressed Enter"
+    if k == "newline":
+        _tap(Key.enter, Key.shift)  # Shift+Enter = new line in chat boxes, normal newline elsewhere
+        return "New line"
+    if k == "undo":
+        _tap("z", Key.ctrl)
+        return "Undo"
+    if k == "switch":
+        return switch_to(action.text)
+    return ""

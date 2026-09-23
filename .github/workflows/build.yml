@@ -1,0 +1,33 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt pyinstaller pytest
+      - run: python -m pytest -q
+      - run: python -m sayso.icons sayso\sayso.ico
+      - run: pyinstaller --noconfirm --clean sayso.spec
+      - name: Build installer
+        run: |
+          choco install innosetup -y --no-progress
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\sayso.iss
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SaysoSetup
+          path: dist/SaysoSetup-*.exe
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/SaysoSetup-*.exe
