@@ -9,7 +9,7 @@ from dataclasses import replace
 import customtkinter as ctk
 
 from sayso import APP_NAME, __version__
-from sayso.config import PTT_KEYS, STT_MODELS, data_dir
+from sayso.config import LANGUAGES, PTT_KEYS, STT_MODELS, data_dir
 
 ACCENT = ("#6E56CF", "#8B7BE0")
 ACCENT_HOVER = ("#5B45B8", "#7A69D6")
@@ -35,6 +35,9 @@ COMMANDS = [
     ("Sayso, scratch that", "undoes the last thing"),
     ("Sayso, open Chrome", "switches to (or opens) an app"),
     ("Sayso, stop listening", "pauses until you turn it back on"),
+    ("Sayso, insert my email", "types a saved snippet (Words tab)"),
+    ("Sayso, new tab", "your own commands (Words tab)"),
+    ("Sayso, see you then comma bye", "say punctuation: comma, question mark, new line"),
     ("Hold Right Ctrl and talk", "types when you let go - no wake word"),
 ]
 
@@ -159,6 +162,89 @@ class AppList(ctk.CTkFrame):
             v.set(value)
         self.ctl.set_all_apps_enabled(value)
         self._filter()
+
+
+class WordsTab(ctk.CTkFrame):
+    """Your words (said -> typed), snippets ("insert my email") and your own voice commands."""
+
+    def __init__(self, master, ctl):
+        super().__init__(master, fg_color="transparent")
+        self.ctl = ctl
+        s = ctk.CTkScrollableFrame(self, fg_color="transparent")
+        s.pack(fill="both", expand=True)
+        self.lists = {}
+        self._section(s, "replacements", "Your words",
+                      "Names and terms Sayso should spell your way.", "When I say", "Type")
+        self._section(s, "snippets", "Snippets",
+                      "Say \"Sayso, insert <name>\". Use \\n for a new line.", "Name", "Text")
+
+        ctk.CTkLabel(s, text="Your own voice commands", font=font(14, "bold")).pack(anchor="w", pady=(16, 0))
+        n = len(ctl.custom.get())
+        probs = ctl.custom.problems
+        ctk.CTkLabel(s, text=f"{n} commands loaded from commands.json" + (f"  -  {len(probs)} need fixing" if probs else "")
+                     + "\nPress keys, type text, open a web page or start a program.",
+                     font=font(12), text_color=MUTED, justify="left").pack(anchor="w", pady=(2, 6))
+        b = ctk.CTkFrame(s, fg_color="transparent")
+        b.pack(anchor="w")
+        ctk.CTkButton(b, text="Edit commands", width=130, height=30, font=font(13), fg_color=ACCENT,
+                      hover_color=ACCENT_HOVER, command=ctl.custom.open_file).pack(side="left")
+        ctk.CTkButton(b, text="How it works", width=110, height=30, font=font(13), fg_color=CARD,
+                      text_color=("black", "white"), hover_color=ACCENT_HOVER,
+                      command=lambda: __import__("webbrowser").open(
+                          "https://github.com/gearwithai/sayso#your-own-voice-commands")).pack(side="left", padx=8)
+
+    def _section(self, parent, key, title, hint, left, right):
+        ctk.CTkLabel(parent, text=title, font=font(14, "bold")).pack(anchor="w", pady=(10, 0))
+        ctk.CTkLabel(parent, text=hint, font=font(12), text_color=MUTED).pack(anchor="w", pady=(0, 4))
+        head = ctk.CTkFrame(parent, fg_color="transparent")
+        head.pack(fill="x")
+        ctk.CTkLabel(head, text=left, width=150, anchor="w", font=font(12), text_color=MUTED).pack(side="left")
+        ctk.CTkLabel(head, text=right, anchor="w", font=font(12), text_color=MUTED).pack(side="left", padx=(8, 0))
+        box = ctk.CTkFrame(parent, fg_color="transparent")
+        box.pack(fill="x")
+        self.lists[key] = (box, [])
+        for said, typed in getattr(self.ctl.cfg, key).items():
+            self._row(key, said, typed.replace("\n", "\\n"))
+        ctk.CTkButton(parent, text="+ Add", width=70, height=26, font=font(12), fg_color=CARD,
+                      text_color=("black", "white"), hover_color=ACCENT_HOVER,
+                      command=lambda: self._row(key, "", "", focus=True)).pack(anchor="w", pady=(4, 0))
+
+    def _row(self, key, a, b, focus=False):
+        box, rows = self.lists[key]
+        r = ctk.CTkFrame(box, fg_color="transparent")
+        r.pack(fill="x", pady=2)
+        ea = ctk.CTkEntry(r, width=150, font=font(13))
+        eb = ctk.CTkEntry(r, font=font(13))
+        ea.insert(0, a)
+        eb.insert(0, b)
+        ea.pack(side="left")
+        eb.pack(side="left", fill="x", expand=True, padx=(8, 6))
+        item = (r, ea, eb)
+        ctk.CTkButton(r, text="\u2715", width=28, height=28, font=font(12), fg_color="transparent",
+                      text_color=MUTED, hover_color=CARD,
+                      command=lambda: self._remove(key, item)).pack(side="right")
+        for e in (ea, eb):
+            e.bind("<FocusOut>", lambda _: self._save(key))
+            e.bind("<Return>", lambda _: self._save(key))
+        rows.append(item)
+        if focus:
+            ea.focus_set()
+
+    def _remove(self, key, item):
+        box, rows = self.lists[key]
+        rows.remove(item)
+        item[0].destroy()
+        self._save(key)
+
+    def _save(self, key):
+        _, rows = self.lists[key]
+        data = {}
+        for _, ea, eb in rows:
+            a, b = " ".join(ea.get().split()), eb.get().strip()
+            if a and b:
+                data[a.lower()] = b.replace("\\n", "\n")
+        if data != getattr(self.ctl.cfg, key):
+            self.ctl.update_cfg(**{key: data})
 
 
 class Wizard(ctk.CTkFrame):
@@ -311,11 +397,12 @@ class MainWindow(ctk.CTk):
         tabs = ctk.CTkTabview(self.content, fg_color="transparent", segmented_button_selected_color=ACCENT,
                               segmented_button_selected_hover_color=ACCENT_HOVER)
         tabs.pack(fill="both", expand=True, padx=14, pady=(0, 10))
-        for name in ("Home", "Apps", "Settings", "Commands"):
+        for name in ("Home", "Apps", "Words", "Settings", "Commands"):
             tabs.add(name)
         self._home(tabs.tab("Home"))
         self.app_list = AppList(tabs.tab("Apps"), self.ctl, height=420)
         self.app_list.pack(fill="both", expand=True, padx=4, pady=4)
+        WordsTab(tabs.tab("Words"), self.ctl).pack(fill="both", expand=True)
         self._settings(tabs.tab("Settings"))
         self._commands(tabs.tab("Commands"))
 
@@ -330,12 +417,15 @@ class MainWindow(ctk.CTk):
         MicMeter(t, self.ctl.engine).pack(fill="x", padx=6, pady=(4, 12))
         self.words = ctk.CTkLabel(t, text="", font=font(13))
         self.words.pack(anchor="w", padx=6)
-        ctk.CTkLabel(t, text="Try saying", font=font(13, "bold")).pack(anchor="w", padx=6, pady=(14, 4))
-        for said, does in COMMANDS[:4]:
-            row = ctk.CTkFrame(t, fg_color="transparent")
-            row.pack(fill="x", padx=6, pady=1)
-            ctk.CTkLabel(row, text=f"“{said}”", font=font(13)).pack(side="left")
-            ctk.CTkLabel(row, text=does, font=font(12), text_color=MUTED).pack(side="right")
+        head = ctk.CTkFrame(t, fg_color="transparent")
+        head.pack(fill="x", padx=6, pady=(14, 4))
+        self.hist_title = ctk.CTkLabel(head, text="", font=font(13, "bold"))
+        self.hist_title.pack(side="left")
+        self.hist_clear = ctk.CTkButton(head, text="Clear", width=54, height=24, font=font(12), fg_color=CARD,
+                                        text_color=("black", "white"), hover_color=ACCENT_HOVER,
+                                        command=self.ctl.clear_history)
+        self.hist_box = ctk.CTkScrollableFrame(t, height=190, fg_color="transparent")
+        self.hist_box.pack(fill="both", expand=True, padx=2)
         self.refresh_home()
 
     def _settings(self, t):
@@ -404,6 +494,8 @@ class MainWindow(ctk.CTk):
         row("Pause that ends a phrase", lambda r: slider(r, "silence_secs", 0.6, 2.5, lambda v: f"{v:.1f}s"))
         row("Hold to talk", lambda r: menu(r, PTT_KEYS, cfg.ptt_key, "ptt_key"))
         row("Speed vs accuracy", lambda r: menu(r, STT_MODELS, cfg.stt_model, "stt_model"))
+        row("Language", lambda r: menu(r, LANGUAGES, cfg.language, "language"))
+        switch("Tidy up text (drop \"um\", spoken punctuation, capitals)", "cleanup")
 
         section("General")
         switch("Beep when Sayso starts listening", "beeps")
@@ -446,9 +538,36 @@ class MainWindow(ctk.CTk):
             self.refresh_home()
 
     def refresh_home(self):
-        if hasattr(self, "words"):
-            n = self.ctl.cfg.words_typed
-            self.words.configure(text=f"{n:,} words typed with Sayso so far" if n else "Nothing typed yet")
+        if not hasattr(self, "words"):
+            return
+        n = self.ctl.cfg.words_typed
+        self.words.configure(text=f"{n:,} words typed with Sayso so far" if n else "Nothing typed yet")
+        for w in self.hist_box.winfo_children():
+            w.destroy()
+        hist = list(reversed(self.ctl.history[-20:]))
+        if hist:
+            self.hist_title.configure(text="Recent  -  click to copy")
+            self.hist_clear.pack(side="right")
+            for h in hist:
+                row = ctk.CTkButton(self.hist_box, text=f"{h['t']}   {h['text'][:70].replace(chr(10), ' ')}",
+                                    anchor="w", height=28, font=font(12), fg_color="transparent",
+                                    text_color=("black", "white"), hover_color=CARD,
+                                    command=lambda x=h["text"]: self._copy(x))
+                row.pack(fill="x")
+        else:
+            self.hist_title.configure(text="Try saying")
+            self.hist_clear.pack_forget()
+            for said, does in COMMANDS[:4]:
+                row = ctk.CTkFrame(self.hist_box, fg_color="transparent")
+                row.pack(fill="x", pady=1)
+                ctk.CTkLabel(row, text=f"\u201c{said}\u201d", font=font(13)).pack(side="left")
+                ctk.CTkLabel(row, text=does, font=font(12), text_color=MUTED).pack(side="right")
+
+    def _copy(self, text):
+        self.clipboard_clear()
+        self.clipboard_append(text)
+        if hasattr(self, "last"):
+            self.last.configure(text="Copied to clipboard")
 
     def apps_changed(self):
         if self.app_list:

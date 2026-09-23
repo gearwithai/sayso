@@ -22,6 +22,11 @@ def models_dir() -> Path:
 
 CONFIG_PATH = data_dir() / "config.json"
 
+LANGUAGES = {
+    "English (fastest)": "en",
+    "Any language (auto-detect)": "auto",
+}
+
 STT_MODELS = {
     "Fast (tiny)": "tiny.en",
     "Balanced (base)": "base.en",
@@ -51,6 +56,10 @@ class Config:
     beeps: bool = True
     launch_at_startup: bool = True
     first_run_done: bool = False
+    language: str = "en"                # "en" (fastest) or "auto" (any language, detected)
+    cleanup: bool = True                # drop "um/uh", spoken punctuation, capitals
+    replacements: dict = field(default_factory=dict)    # said -> typed ("gear with ai" -> "GearWithAI")
+    snippets: dict = field(default_factory=dict)        # "insert my email" -> text
     disabled_apps: list = field(default_factory=list)   # AppIDs where Sayso stays quiet
     words_typed: int = 0                                 # shown on the home screen
 

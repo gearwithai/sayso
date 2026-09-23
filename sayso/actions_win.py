@@ -1,6 +1,8 @@
 """Windows side effects: paste text, press keys, switch to / open apps."""
 import ctypes
+import subprocess
 import time
+import webbrowser
 from ctypes import wintypes
 
 import pyperclip
@@ -8,6 +10,7 @@ from pynput.keyboard import Controller, Key
 
 from sayso import apps as apps_mod
 from sayso.commands import Action
+from sayso.custom import parse_keys
 
 kb = Controller()
 user32 = ctypes.windll.user32
@@ -101,7 +104,47 @@ def switch_to(spoken: str, app_list: list) -> str:
     return f"Couldn't find an app called {spoken}"
 
 
-def perform(action: Action, app_list: list) -> str:
+KEYMAP = {
+    "ctrl": Key.ctrl, "shift": Key.shift, "alt": Key.alt, "win": Key.cmd,
+    "enter": Key.enter, "return": Key.enter, "tab": Key.tab, "esc": Key.esc, "escape": Key.esc,
+    "space": Key.space, "backspace": Key.backspace, "delete": Key.delete, "del": Key.delete,
+    "home": Key.home, "end": Key.end, "pageup": Key.page_up, "pagedown": Key.page_down,
+    "up": Key.up, "down": Key.down, "left": Key.left, "right": Key.right,
+    "insert": Key.insert, "printscreen": Key.print_screen, "capslock": Key.caps_lock,
+    "volumeup": Key.media_volume_up, "volumedown": Key.media_volume_down, "mute": Key.media_volume_mute,
+    "playpause": Key.media_play_pause, "nexttrack": Key.media_next, "prevtrack": Key.media_previous,
+}
+
+
+def _key(name: str):
+    if name in KEYMAP:
+        return KEYMAP[name]
+    if name.startswith("f") and name[1:].isdigit():
+        return getattr(Key, name)
+    return name  # a single character
+
+
+def press_combo(spec: str) -> None:
+    mods, key = parse_keys(spec)
+    _tap(_key(key), *[_key(m) for m in mods])
+
+
+def run_custom(entry: dict) -> str:
+    say = entry["say"]
+    if "keys" in entry:
+        for spec in entry["keys"] if isinstance(entry["keys"], list) else [entry["keys"]]:
+            press_combo(str(spec))
+            time.sleep(0.05)
+    elif "type" in entry:
+        paste(str(entry["type"]))
+    elif "url" in entry:
+        webbrowser.open(str(entry["url"]))
+    elif "run" in entry:
+        subprocess.Popen(["cmd", "/c", "start", "", str(entry["run"])], creationflags=0x08000000)
+    return f"Done: {say}"
+
+
+def perform(action: Action, app_list: list, custom: dict | None = None) -> str:
     k = action.kind
     if k == "type":
         paste(action.text + " ")
@@ -122,4 +165,10 @@ def perform(action: Action, app_list: list) -> str:
         return "Undo"
     if k == "switch":
         return switch_to(action.text, app_list)
+    if k == "snippet":
+        paste(action.text)
+        return "Inserted snippet"
+    if k == "custom":
+        entry = (custom or {}).get(action.text)
+        return run_custom(entry) if entry else f"No command called {action.text}"
     return ""

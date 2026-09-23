@@ -33,7 +33,7 @@ def make_engine(texts, allowed=lambda a: None, **cfg):
         return "ok"
 
     e = Engine(Config(silence_secs=0.5, **cfg), perform, lambda s, m: states.append((s, m)),
-               beep=lambda h: None, allowed=allowed, on_typed=typed.append)
+               beep=lambda h: None, allowed=allowed, on_typed=lambda a: typed.append(len(a.text.split())))
     e._stt = FakeSTT(texts)
     e._load_models = lambda: None
     e._open_mic = lambda: None

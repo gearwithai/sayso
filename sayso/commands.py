@@ -2,14 +2,14 @@
 import re
 from dataclasses import dataclass
 
-
 # Whisper often hears short commands with filler punctuation or case.
 _TRIM = " .,!?;:\"'"
 
 
 @dataclass(frozen=True)
 class Action:
-    kind: str          # "type", "send", "type_send", "switch", "newline", "undo", "stop", "nothing"
+    # type, type_send, send, newline, undo, stop, switch, snippet, custom, nothing
+    kind: str
     text: str = ""
 
 
@@ -17,15 +17,24 @@ def _clean(s: str) -> str:
     return re.sub(r"\s+", " ", s).strip(_TRIM)
 
 
-def parse(transcript: str, send_word: str = "send", allow_commands: bool = True) -> Action:
-    text = _clean(transcript)
+def norm(s: str) -> str:
+    """How phrases are compared: lower case, letters/digits/spaces only."""
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", s.lower())).strip()
+
+
+def parse(transcript: str, send_word: str = "send", allow_commands: bool = True,
+          snippets: dict | None = None, custom: list | None = None) -> Action:
+    raw = re.sub(r"\s+", " ", transcript).strip()
+    text = _clean(raw)
     if not text:
         return Action("nothing")
+    # keep what Whisper punctuated ("How are you?") - only drop leading junk
+    typed = raw.lstrip(_TRIM)
     if not allow_commands:
-        return Action("type", text)
+        return Action("type", typed)
 
-    low = text.lower()
-    sw = send_word.lower().strip()
+    low = norm(text)
+    sw = norm(send_word)
 
     if low in (sw, f"{sw} it", "hit enter", "press enter", "enter"):
         return Action("send")
@@ -36,16 +45,31 @@ def parse(transcript: str, send_word: str = "send", allow_commands: bool = True)
     if low in ("stop listening", "go to sleep", "pause sayso"):
         return Action("stop")
 
+    # your own voice commands (commands.json) - exact phrase
+    for phrase in custom or []:
+        if norm(phrase) == low:
+            return Action("custom", phrase)
+
+    # "insert my email" -> saved snippet
+    m = re.match(r"^(?:insert|paste|type out)\s+(?:my\s+|the\s+)?(.+)$", low)
+    if m and snippets:
+        want = m.group(1)
+        for name, value in snippets.items():
+            n = norm(name)
+            if want in (n, f"my {n}", f"the {n}") or n == want.removeprefix("my ").removeprefix("the "):
+                return Action("snippet", value)
+        # no such snippet: it was probably just dictation ("insert a table here") - type it
+
     m = re.match(r"^(?:open|switch to|go to)\s+(.+)$", low)
     if m:
-        target = _clean(m.group(1))
-        return Action("switch", target)
+        return Action("switch", _clean(m.group(1)))
 
     # "...and run the tests, send" -> type the body, then press Enter
-    m = re.match(rf"^(.*\S)[\s,.;:!?]+{re.escape(sw)}$", text, flags=re.IGNORECASE)
-    if m and sw:
-        body = _clean(m.group(1))
-        if body:
-            return Action("type_send", body)
+    if sw:
+        m = re.match(rf"^(.*\S)[\s,.;:!?]+{re.escape(send_word.strip())}[\s.!]*$", raw, flags=re.IGNORECASE)
+        if m:
+            body = m.group(1).lstrip(_TRIM).rstrip(" ,.;:")
+            if body:
+                return Action("type_send", body)
 
-    return Action("type", text)
+    return Action("type", typed)

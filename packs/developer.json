@@ -1,0 +1,12 @@
+{
+  "_about": "Voice commands for coding. Copy the ones you like into %APPDATA%\\Sayso\\commands.json",
+  "commands": [
+    { "say": "command palette", "keys": "ctrl+shift+p" },
+    { "say": "find file", "keys": "ctrl+p" },
+    { "say": "save file", "keys": "ctrl+s" },
+    { "say": "comment line", "keys": "ctrl+/" },
+    { "say": "new terminal", "keys": "ctrl+shift+`" },
+    { "say": "go to definition", "keys": "f12" },
+    { "say": "run tests", "type": "npm test\n" }
+  ]
+}

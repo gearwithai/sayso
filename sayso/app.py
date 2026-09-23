@@ -1,6 +1,7 @@
 """Entry point: tray icon + engine + window, wired together."""
 import json
 import logging
+import time
 import queue
 import sys
 import threading
@@ -17,7 +18,8 @@ log = logging.getLogger("sayso")
 REPO = "gearwithai/sayso"
 DOWNLOAD_PAGE = "https://gearwithai.github.io/sayso/"
 ENGINE_KEYS = {"hands_free", "wake_word", "stt_model", "mic_device", "silence_level", "silence_secs", "send_word",
-               "beeps", "max_secs"}
+               "beeps", "max_secs", "language"}
+HISTORY_MAX = 50
 
 
 def setup_logging():
@@ -41,6 +43,9 @@ class App:
         from sayso.hotkey import PushToTalk
         from sayso.icons import mic_icon
         from sayso.ui import MainWindow, STATUS
+        from sayso.commands import Action, parse
+        from sayso.custom import CustomCommands
+        from sayso.text import clean
 
         self.pystray, self.winutil, self.mic_icon, self.apps_mod, self.STATUS = pystray, winutil, mic_icon, apps, STATUS
         self.cfg = Config.load()
@@ -52,10 +57,23 @@ class App:
         self.scanning = False
         self.state, self.last_msg, self.update_url = "loading", "", None
         self._ui: "queue.Queue" = queue.Queue()
+        self.custom = CustomCommands()
+        self.history = self._load_history()
 
-        self.engine = Engine(self.cfg, lambda a: actions_win.perform(a, self.apps),
+        def parser(text, allow_commands):
+            return parse(text, self.cfg.send_word, allow_commands=allow_commands,
+                         snippets=self.cfg.snippets, custom=list(self.custom.get()))
+
+        def perform(a):
+            if a.kind in ("type", "type_send"):
+                a = Action(a.kind, clean(a.text, self.cfg.replacements, self.cfg.cleanup))
+                self._last_typed = a.text
+            return actions_win.perform(a, self.apps, self.custom.get())
+
+        self._last_typed = ""
+        self.engine = Engine(self.cfg, perform,
                              on_state=lambda s, m: self.ui(lambda: self.on_state(s, m)),
-                             beep=winutil.beep, allowed=self.allowed, on_typed=self.on_typed)
+                             beep=winutil.beep, allowed=self.allowed, on_typed=self.on_typed, parser=parser)
         self.ptt = PushToTalk(self.engine)
         self.ptt.set_key(self.cfg.ptt_key)
         self.window = MainWindow(self)
@@ -109,10 +127,34 @@ class App:
             return f"Sayso is turned off in {app.name} - turn it on in the Apps tab"
         return None
 
-    def on_typed(self, n):
+    # ---------- history (kept only on this PC) ----------
+    @staticmethod
+    def _history_path():
+        return data_dir() / "history.json"
+
+    def _load_history(self):
+        try:
+            return json.loads(self._history_path().read_text(encoding="utf-8"))[-HISTORY_MAX:]
+        except Exception:
+            return []
+
+    def clear_history(self):
+        self.history = []
+        self._history_path().write_text("[]", encoding="utf-8")
+        self.window.refresh_home()
+
+    def on_typed(self, action):
+        text = self._last_typed if action.kind in ("type", "type_send") else action.text
+        n = len(text.split())
+
         def save():
             self.cfg.words_typed += n
             self.cfg.save()
+            self.history = (self.history + [{"t": time.strftime("%H:%M"), "text": text}])[-HISTORY_MAX:]
+            try:
+                self._history_path().write_text(json.dumps(self.history), encoding="utf-8")
+            except Exception:
+                log.exception("history save failed")
             self.window.refresh_home()
         self.ui(save)
 

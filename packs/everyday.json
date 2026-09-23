@@ -1,0 +1,14 @@
+{
+  "_about": "Everyday voice commands. Copy the ones you like into %APPDATA%\\Sayso\\commands.json",
+  "commands": [
+    { "say": "new tab", "keys": "ctrl+t" },
+    { "say": "close tab", "keys": "ctrl+w" },
+    { "say": "reopen tab", "keys": "ctrl+shift+t" },
+    { "say": "show desktop", "keys": "win+d" },
+    { "say": "take screenshot", "keys": "win+shift+s" },
+    { "say": "next song", "keys": "nexttrack" },
+    { "say": "pause music", "keys": "playpause" },
+    { "say": "open calendar", "url": "https://calendar.google.com" },
+    { "say": "open gmail", "url": "https://mail.google.com" }
+  ]
+}

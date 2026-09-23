@@ -35,21 +35,23 @@ def rms(chunk: np.ndarray) -> float:
 
 
 def count_words(action: Action) -> int:
-    return len(action.text.split()) if action.kind in ("type", "type_send") else 0
+    return len(action.text.split()) if action.kind in ("type", "type_send", "snippet") else 0
 
 
 class Engine(threading.Thread):
     def __init__(self, cfg: Config, perform: Callable[[Action], str],
                  on_state: Callable[[str, str], None], beep: Callable[[bool], None],
                  allowed: Callable[[Action], str | None] = lambda a: None,
-                 on_typed: Callable[[int], None] = lambda n: None):
+                 on_typed: Callable[[Action], None] = lambda a: None,
+                 parser: Callable[[str, bool], Action] | None = None):
         super().__init__(daemon=True, name="sayso-engine")
         self.cfg = cfg
         self.perform = perform
         self.on_state = on_state
         self.beep = beep
         self.allowed = allowed          # returns a reason string when an action is blocked (e.g. app turned off)
-        self.on_typed = on_typed        # word counter (stats)
+        self.on_typed = on_typed        # called with each typed action (history, stats)
+        self.parser = parser            # transcript -> Action (knows snippets / custom commands)
         self.audio: "queue.Queue[np.ndarray]" = queue.Queue(maxsize=600)
         self.level = 0.0
         self.state = LOADING
@@ -119,14 +121,30 @@ class Engine(threading.Thread):
                                       device=self.cfg.mic_device, callback=self._on_audio)
         self._stream.start()
 
+    @property
+    def model_name(self) -> str:
+        """English-only models are faster; 'Any language' needs the multilingual one."""
+        m = self.cfg.stt_model
+        return m.removesuffix(".en") if self.cfg.language != "en" else m
+
+    @property
+    def language(self):
+        return None if self.cfg.language == "auto" else self.cfg.language
+
+    def _vocab_prompt(self, lead: str = "") -> str | None:
+        """Spelling hints for Whisper: the wake word and the user's own words."""
+        words = [w for w in dict.fromkeys(getattr(self.cfg, "replacements", {}).values()) if w and len(w) < 40][:20]
+        text = " ".join(x for x in (lead, ", ".join(words)) if x)
+        return text or None
+
     def _load_models(self):
-        if self._loaded_model == self.cfg.stt_model:
+        if self._loaded_model == self.model_name:
             return
         self._set_state(LOADING, "Downloading speech model (first run only)...")
         from faster_whisper import WhisperModel
-        self._stt = WhisperModel(self.cfg.stt_model, device="cpu", compute_type="int8",
+        self._stt = WhisperModel(self.model_name, device="cpu", compute_type="int8",
                                  download_root=str(models_dir() / "whisper"))
-        self._loaded_model = self.cfg.stt_model
+        self._loaded_model = self.model_name
 
     # ---------- audio helpers ----------
     def _next(self, timeout=0.1):
@@ -187,13 +205,14 @@ class Engine(threading.Thread):
 
     def _transcribe(self, audio_i16: np.ndarray, prompt: str | None = None) -> str:
         audio = audio_i16.astype(np.float32) / 32768
-        segments, _ = self._stt.transcribe(audio, language="en", vad_filter=True, beam_size=1,
+        segments, _ = self._stt.transcribe(audio, language=self.language, vad_filter=True, beam_size=1,
                                            initial_prompt=prompt, condition_on_previous_text=False)
         return " ".join(s.text for s in segments).strip()
 
     # ---------- acting ----------
     def _act(self, text: str, allow_commands: bool):
-        action = parse(text, self.cfg.send_word, allow_commands=allow_commands)
+        action = (self.parser(text, allow_commands) if self.parser
+                  else parse(text, self.cfg.send_word, allow_commands=allow_commands))
         log.info("heard %r -> %s", text, action)
         if action.kind == "stop":
             self.set_paused(True)
@@ -208,7 +227,7 @@ class Engine(threading.Thread):
             return
         msg = self.perform(action)
         if words:
-            self.on_typed(words)
+            self.on_typed(action)
         self._set_state(self._idle_state(), msg)
 
     def _hands_free(self, first_chunk):
@@ -237,12 +256,12 @@ class Engine(threading.Thread):
                 self._set_state(self._idle_state(), "Didn't hear anything")
                 return
             self._set_state(THINKING)
-            self._act(self._transcribe(cmd), allow_commands=True)
+            self._act(self._transcribe(cmd, self._vocab_prompt()), allow_commands=True)
             return
 
         # "Sayso, <command>" in one go
         self._set_state(THINKING)
-        full = gate_text if len(utt) <= gate_len else self._transcribe(utt, prompt)
+        full = gate_text if len(utt) <= gate_len else self._transcribe(utt, self._vocab_prompt(prompt))
         woke, rest = wake.match(full, cfg.wake_word)
         self._act(rest if woke else full, allow_commands=True)
 
@@ -255,7 +274,7 @@ class Engine(threading.Thread):
             self._set_state(self._idle_state())
             return
         self._set_state(THINKING)
-        self._act(self._transcribe(audio), allow_commands=False)
+        self._act(self._transcribe(audio, self._vocab_prompt()), allow_commands=False)
 
     # ---------- main loop ----------
     def run(self):
