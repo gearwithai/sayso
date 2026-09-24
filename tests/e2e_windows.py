@@ -1,1 +1,283 @@
-IiIiRW5kLXRvLWVuZCB0ZXN0IG9uIHJlYWwgV2luZG93cyAocnVuIGJ5IENJIG9uIGEgV2luZG93cyBtYWNoaW5lOyBub3QgcGFydCBvZiB0aGUgbm9ybWFsIHB5dGVzdCBydW4pLgoKICAgIHB5dGhvbiB0ZXN0cy9lMmVfd2luZG93cy5weSAtLW1ha2Utd2F2cyBESVIgICAgIHNwZWFrIHRoZSB0ZXN0IHBocmFzZXMgd2l0aCB0aGUgV2luZG93cyB2b2ljZQogICAgcHl0aG9uIHRlc3RzL2UyZV93aW5kb3dzLnB5IC0tcnVuIERJUiAgICAgICAgICAgZHJpdmUgdGhlIHJlYWwgYXBwIHdpdGggdGhlbQoKVGhlIHJlYWwgQXBwIHJ1bnM6IHNwZWVjaCAoV2luZG93cycgb3duIHZvaWNlLCBub3QgYSBwZXJzb24pIC0+IHRoZSByZWFsIFdoaXNwZXIgbW9kZWwgLT4gd2FrZSB3b3JkCi0+IGNvbW1hbmRzIC0+IHRleHQgY2xlYW51cCAtPiBjbGlwYm9hcmQgcGFzdGUgLT4ga2V5c3Ryb2tlcyBpbnRvIGEgcmVhbCBOb3RlcGFkIHdpbmRvdy4gT25seSB0aGUKbWljcm9waG9uZSBpcyByZXBsYWNlZDogdGhlIHJlY29yZGVkIHBocmFzZXMgYXJlIGZlZCBpbiB3aGVyZSBtaWMgYXVkaW8gd291bGQgYXJyaXZlLgpBbiBBSSBzZXJ2ZXIgaXMgZmFrZWQgbG9jYWxseSBzbyAibWFrZSB0aGF0IG1vcmUgZm9ybWFsIiBjYW4gYmUgY2hlY2tlZCB3aXRob3V0IGFuIEFQSSBrZXkuCiIiIgppbXBvcnQgY3R5cGVzCmltcG9ydCBqc29uCmltcG9ydCBvcwppbXBvcnQgc3VicHJvY2VzcwppbXBvcnQgc3lzCmltcG9ydCB0ZW1wZmlsZQppbXBvcnQgdGhyZWFkaW5nCmltcG9ydCB0aW1lCmltcG9ydCB3YXZlCmZyb20gY3R5cGVzIGltcG9ydCB3aW50eXBlcwpmcm9tIGh0dHAuc2VydmVyIGltcG9ydCBCYXNlSFRUUFJlcXVlc3RIYW5kbGVyLCBIVFRQU2VydmVyCmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAoKUEhSQVNFUyA9IHsKICAgICMgZmlsZSBuYW1lOiB3aGF0IHRoZSBXaW5kb3dzIHZvaWNlIHNheXMgKCJTYXktc28iIGlzIGhvdyB0aGUgd2FrZSB3b3JkIGlzIHNwb2tlbikKICAgICIwMV9oZWxsbyI6ICJTYXktc28sIGhlbGxvIHdvcmxkLiIsCiAgICAiMDJfbm90X2Zvcl91cyI6ICJTYXkgc29tZXRoaW5nIG5pY2UgYWJvdXQgdGhlIHdlYXRoZXIgdG9kYXkuIiwKICAgICIwM19tZWV0aW5nIjogIlNheS1zbywgdGhlIG1lZXRpbmcgaXMgYXQgZml2ZS4iLAogICAgIjA0X2Zvcm1hbCI6ICJTYXktc28sIG1ha2UgdGhhdCBtb3JlIGZvcm1hbC4iLAogICAgIjA1X2RpY3RhdGlvbl9vbiI6ICJTYXktc28sIHN0YXJ0IGRpY3RhdGlvbi4iLAogICAgIjA2X2RpY3RhdGluZyI6ICJUaGlzIHNlbnRlbmNlIGhhcyBubyB3YWtlIHdvcmQgYXQgYWxsLiIsCiAgICAiMDdfZGljdGF0aW9uX29mZiI6ICJTdG9wIGRpY3RhdGlvbi4iLAogICAgIjA4X2hvbGQiOiAiVGhpcyB3YXMgdHlwZWQgd2l0aCBob2xkIHRvIHRhbGsuIiwKICAgICIwOV9zZW5kIjogIlNheS1zbywgc2VuZC4iLAogICAgIjEwX3N3aXRjaCI6ICJTYXktc28sIHN3aXRjaCB0byBOb3RlcGFkLiIsCiAgICAiMTFfYWZ0ZXJfc3dpdGNoIjogIlNheS1zbywgdHlwZWQgcmlnaHQgYWZ0ZXIgc3dpdGNoaW5nLiIsCiAgICAiMTJfamFydmlzX3Rlc3QiOiAiSmFydmlzLCBoZWxsby4iLAogICAgIjEzX2phcnZpc190eXBlIjogIkphcnZpcywgdHlwZWQgd2l0aCBhIG5ldyBuYW1lLiIsCiAgICAiMTRfb2xkX25hbWUiOiAiU2F5LXNvLCB0aGUgb2xkIG5hbWUgc2hvdWxkIGRvIG5vdGhpbmcuIiwKfQpBSV9BTlNXRVIgPSAiVGhlIG1lZXRpbmcgaXMgc2NoZWR1bGVkIGZvciA1IFBNLiIKCgpkZWYgbWFrZV93YXZzKGZvbGRlcjogUGF0aCk6CiAgICBmb2xkZXIubWtkaXIocGFyZW50cz1UcnVlLCBleGlzdF9vaz1UcnVlKQogICAgbGluZXMgPSBbIkFkZC1UeXBlIC1Bc3NlbWJseU5hbWUgU3lzdGVtLlNwZWVjaCIsCiAgICAgICAgICAgICAiJHMgPSBOZXctT2JqZWN0IFN5c3RlbS5TcGVlY2guU3ludGhlc2lzLlNwZWVjaFN5bnRoZXNpemVyIiwKICAgICAgICAgICAgICIkcy5SYXRlID0gLTEiLAogICAgICAgICAgICAgIiRmID0gTmV3LU9iamVjdCBTeXN0ZW0uU3BlZWNoLkF1ZGlvRm9ybWF0LlNwZWVjaEF1ZGlvRm9ybWF0SW5mbygxNjAwMCwgIgogICAgICAgICAgICAgIltTeXN0ZW0uU3BlZWNoLkF1ZGlvRm9ybWF0LkF1ZGlvQml0c1BlclNhbXBsZV06OlNpeHRlZW4sIFtTeXN0ZW0uU3BlZWNoLkF1ZGlvRm9ybWF0LkF1ZGlvQ2hhbm5lbF06Ok1vbm8pIl0KICAgIGZvciBuYW1lLCB0ZXh0IGluIFBIUkFTRVMuaXRlbXMoKToKICAgICAgICBsaW5lcyArPSBbZiIkcy5TZXRPdXRwdXRUb1dhdmVGaWxlKCd7Zm9sZGVyIC8gKG5hbWUgKyAnLndhdicpfScsICRmKSIsIGYiJHMuU3BlYWsoXCJ7dGV4dH1cIikiXQogICAgbGluZXMuYXBwZW5kKCIkcy5TZXRPdXRwdXRUb051bGwoKSIpCiAgICBzdWJwcm9jZXNzLnJ1bihbInBvd2Vyc2hlbGwiLCAiLU5vUHJvZmlsZSIsICItQ29tbWFuZCIsICI7ICIuam9pbihsaW5lcyldLCBjaGVjaz1UcnVlKQogICAgcHJpbnQoIm1hZGUiLCBsZW4obGlzdChmb2xkZXIuZ2xvYigiKi53YXYiKSkpLCAicGhyYXNlcyIpCgoKIyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIE5vdGVwYWQgaGVscGVycwp1c2VyMzIgPSBjdHlwZXMud2luZGxsLnVzZXIzMgp1c2VyMzIuRmluZFdpbmRvd1cucmVzdHlwZSA9IHdpbnR5cGVzLkhXTkQKdXNlcjMyLkZpbmRXaW5kb3dFeFcucmVzdHlwZSA9IHdpbnR5cGVzLkhXTkQKdXNlcjMyLkZpbmRXaW5kb3dFeFcuYXJndHlwZXMgPSBbd2ludHlwZXMuSFdORCwgd2ludHlwZXMuSFdORCwgd2ludHlwZXMuTFBDV1NUUiwgd2ludHlwZXMuTFBDV1NUUl0KdXNlcjMyLlNlbmRNZXNzYWdlVy5hcmd0eXBlcyA9IFt3aW50eXBlcy5IV05ELCB3aW50eXBlcy5VSU5ULCB3aW50eXBlcy5XUEFSQU0sIHdpbnR5cGVzLkxQQVJBTV0KdXNlcjMyLlNlbmRNZXNzYWdlVy5yZXN0eXBlID0gY3R5cGVzLmNfc3NpemVfdAp1c2VyMzIuR2V0U2hlbGxXaW5kb3cucmVzdHlwZSA9IHdpbnR5cGVzLkhXTkQKV01fU0VUVEVYVCwgV01fR0VUVEVYVCwgV01fR0VUVEVYVExFTkdUSCA9IDB4MDAwQywgMHgwMDBELCAweDAwMEUKCgpjbGFzcyBOb3RlcGFkOgogICAgZGVmIF9faW5pdF9fKHNlbGYpOgogICAgICAgIHNlbGYucHJvYyA9IHN1YnByb2Nlc3MuUG9wZW4oWyJub3RlcGFkLmV4ZSJdKQogICAgICAgIGZvciBfIGluIHJhbmdlKDEwMCk6CiAgICAgICAgICAgIHNlbGYuaHduZCA9IHVzZXIzMi5GaW5kV2luZG93VygiTm90ZXBhZCIsIE5vbmUpCiAgICAgICAgICAgIGlmIHNlbGYuaHduZDoKICAgICAgICAgICAgICAgIGJyZWFrCiAgICAgICAgICAgIHRpbWUuc2xlZXAoMC4xKQogICAgICAgIGFzc2VydCBzZWxmLmh3bmQsICJOb3RlcGFkIGRpZG4ndCBvcGVuIgogICAgICAgIHNlbGYuZWRpdCA9IHVzZXIzMi5GaW5kV2luZG93RXhXKHNlbGYuaHduZCwgTm9uZSwgIkVkaXQiLCBOb25lKSBvciBcCiAgICAgICAgICAgIHVzZXIzMi5GaW5kV2luZG93RXhXKHNlbGYuaHduZCwgTm9uZSwgIlJpY2hFZGl0RDJEUFQiLCBOb25lKQogICAgICAgIGFzc2VydCBzZWxmLmVkaXQsICJOb3RlcGFkJ3MgdGV4dCBib3ggbm90IGZvdW5kIgoKICAgIGRlZiBmb2N1cyhzZWxmKToKICAgICAgICBmcm9tIHNheXNvLmFjdGlvbnNfd2luIGltcG9ydCBfZm9jdXMKICAgICAgICBfZm9jdXMoc2VsZi5od25kKQogICAgICAgIHRpbWUuc2xlZXAoMC4zKQoKICAgIGRlZiB0ZXh0KHNlbGYpIC0+IHN0cjoKICAgICAgICBuID0gdXNlcjMyLlNlbmRNZXNzYWdlVyhzZWxmLmVkaXQsIFdNX0dFVFRFWFRMRU5HVEgsIDAsIDApCiAgICAgICAgYnVmID0gY3R5cGVzLmNyZWF0ZV91bmljb2RlX2J1ZmZlcihuICsgMSkKICAgICAgICB1c2VyMzIuU2VuZE1lc3NhZ2VXKHNlbGYuZWRpdCwgV01fR0VUVEVYVCwgbiArIDEsIGN0eXBlcy5hZGRyZXNzb2YoYnVmKSkKICAgICAgICByZXR1cm4gYnVmLnZhbHVlCgogICAgZGVmIGNsZWFyKHNlbGYpOgogICAgICAgIGJ1ZiA9IGN0eXBlcy5jcmVhdGVfdW5pY29kZV9idWZmZXIoIiIpCiAgICAgICAgdXNlcjMyLlNlbmRNZXNzYWdlVyhzZWxmLmVkaXQsIFdNX1NFVFRFWFQsIDAsIGN0eXBlcy5hZGRyZXNzb2YoYnVmKSkKCiAgICBkZWYgY2xvc2Uoc2VsZik6CiAgICAgICAgc2VsZi5wcm9jLmtpbGwoKQoKCiMgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSBmYWtlIEFJIHNlcnZlciAoT3BlbkFJLXN0eWxlKQpjbGFzcyBGYWtlQUkoQmFzZUhUVFBSZXF1ZXN0SGFuZGxlcik6CiAgICBzZWVuID0gW10KCiAgICBkZWYgZG9fUE9TVChzZWxmKToKICAgICAgICBib2R5ID0ganNvbi5sb2FkcyhzZWxmLnJmaWxlLnJlYWQoaW50KHNlbGYuaGVhZGVyc1siQ29udGVudC1MZW5ndGgiXSkpKQogICAgICAgIEZha2VBSS5zZWVuLmFwcGVuZChib2R5WyJtZXNzYWdlcyJdWy0xXVsiY29udGVudCJdKQogICAgICAgIGRhdGEgPSBqc29uLmR1bXBzKHsiY2hvaWNlcyI6IFt7Im1lc3NhZ2UiOiB7ImNvbnRlbnQiOiBBSV9BTlNXRVJ9fV19KS5lbmNvZGUoKQogICAgICAgIHNlbGYuc2VuZF9yZXNwb25zZSgyMDApCiAgICAgICAgc2VsZi5zZW5kX2hlYWRlcigiQ29udGVudC1UeXBlIiwgImFwcGxpY2F0aW9uL2pzb24iKQogICAgICAgIHNlbGYuZW5kX2hlYWRlcnMoKQogICAgICAgIHNlbGYud2ZpbGUud3JpdGUoZGF0YSkKCiAgICBkZWYgbG9nX21lc3NhZ2Uoc2VsZiwgKmEpOgogICAgICAgIHBhc3MKCgpkZWYgcnVuKGZvbGRlcjogUGF0aCkgLT4gaW50OgogICAgcHJvZmlsZSA9IFBhdGgodGVtcGZpbGUubWtkdGVtcCgpKQogICAgb3MuZW52aXJvblsiQVBQREFUQSJdID0gc3RyKHByb2ZpbGUpCiAgICBzeXMucGF0aC5pbnNlcnQoMCwgc3RyKFBhdGgoX19maWxlX18pLnJlc29sdmUoKS5wYXJlbnRzWzFdKSkKICAgIHNlcnZlciA9IEhUVFBTZXJ2ZXIoKCIxMjcuMC4wLjEiLCAwKSwgRmFrZUFJKQogICAgdGhyZWFkaW5nLlRocmVhZCh0YXJnZXQ9c2VydmVyLnNlcnZlX2ZvcmV2ZXIsIGRhZW1vbj1UcnVlKS5zdGFydCgpCgogICAgaW1wb3J0IG51bXB5IGFzIG5wCiAgICBmcm9tIHNheXNvIGltcG9ydCB3aW5jbGlwCiAgICBmcm9tIHNheXNvLmNvbmZpZyBpbXBvcnQgQ29uZmlnCiAgICBmcm9tIHNheXNvLmVuZ2luZSBpbXBvcnQgQ0hVTksKICAgIENvbmZpZyhmaXJzdF9ydW5fZG9uZT1UcnVlLCBiZWVwcz1GYWxzZSwgYWlfcHJvdmlkZXI9Imxtc3R1ZGlvIiwgYWlfbW9kZWw9ImZha2UtbW9kZWwiLAogICAgICAgICAgIGFpX2Jhc2VfdXJsPWYiaHR0cDovLzEyNy4wLjAuMTp7c2VydmVyLnNlcnZlcl9wb3J0fS92MSIsIHNob3dfYnViYmxlPVRydWUpLnNhdmUoKQogICAgZnJvbSBzYXlzby5hcHAgaW1wb3J0IEFwcCwgc2V0dXBfbG9nZ2luZwogICAgc2V0dXBfbG9nZ2luZygpCiAgICBhcHAgPSBBcHAoKQogICAgYXBwLmVuZ2luZS5fb3Blbl9taWMgPSBsYW1iZGEgcmVzY2FuPUZhbHNlOiBOb25lICAgIyB0aGUgcmVjb3JkZWQgcGhyYXNlcyBzdGFuZCBpbiBmb3IgdGhlIG1pYwogICAgcmVzdWx0cywgZmFpbHVyZXMgPSBbXSwgW10KCiAgICBkZWYgY2hlY2sobmFtZSwgY29uZCwgZGV0YWlsKToKICAgICAgICByZXN1bHRzLmFwcGVuZCgobmFtZSwgYm9vbChjb25kKSwgZGV0YWlsKSkKICAgICAgICBpZiBub3QgY29uZDoKICAgICAgICAgICAgZmFpbHVyZXMuYXBwZW5kKG5hbWUpCiAgICAgICAgcHJpbnQoKCJQQVNTICIgaWYgY29uZCBlbHNlICJGQUlMICIpICsgbmFtZSArICIgfCAiICsgc3RyKGRldGFpbClbOjMwMF0sIGZsdXNoPVRydWUpCgogICAgZGVmIGF1ZGlvKG5hbWUpOgogICAgICAgIHdpdGggd2F2ZS5vcGVuKHN0cihmb2xkZXIgLyBmIntuYW1lfS53YXYiKSkgYXMgdzoKICAgICAgICAgICAgYSA9IG5wLmZyb21idWZmZXIody5yZWFkZnJhbWVzKHcuZ2V0bmZyYW1lcygpKSwgZHR5cGU9bnAuaW50MTYpCiAgICAgICAgcmV0dXJuIFthW2k6aSArIENIVU5LXSBmb3IgaSBpbiByYW5nZSgwLCBsZW4oYSkgLSBDSFVOSywgQ0hVTkspXQoKICAgIGRlZiBzYXkobmFtZSwgZ2FwPTEuNik6CiAgICAgICAgZm9yIGMgaW4gYXVkaW8obmFtZSkgKyBbbnAuemVyb3MoQ0hVTkssIG5wLmludDE2KV0gKiBpbnQoZ2FwICogMTYwMDAgLyBDSFVOSyk6CiAgICAgICAgICAgIGFwcC5lbmdpbmUuYXVkaW8ucHV0KGMpCiAgICAgICAgICAgIHRpbWUuc2xlZXAoMC4wMikKCiAgICBkZWYgc2V0dGxlKHNlY3M9MjApOgogICAgICAgICIiIldhaXQgdW50aWwgdGhlIGVuZ2luZSBoYXMgZmluaXNoZWQgd2l0aCBldmVyeXRoaW5nIGl0IGhlYXJkLiIiIgogICAgICAgIGVuZCA9IHRpbWUudGltZSgpICsgc2VjcwogICAgICAgIHRpbWUuc2xlZXAoMC41KQogICAgICAgIHdoaWxlIHRpbWUudGltZSgpIDwgZW5kOgogICAgICAgICAgICBpZiBhcHAuZW5naW5lLmF1ZGlvLmVtcHR5KCkgYW5kIGFwcC5lbmdpbmUuc3RhdGUgaW4gKCJyZWFkeSIsICJkaWN0YXRpbmciLCAicGF1c2VkIik6CiAgICAgICAgICAgICAgICB0aW1lLnNsZWVwKDEuMCkKICAgICAgICAgICAgICAgIGlmIGFwcC5lbmdpbmUuYXVkaW8uZW1wdHkoKSBhbmQgYXBwLmVuZ2luZS5zdGF0ZSBpbiAoInJlYWR5IiwgImRpY3RhdGluZyIsICJwYXVzZWQiKToKICAgICAgICAgICAgICAgICAgICByZXR1cm4KICAgICAgICAgICAgdGltZS5zbGVlcCgwLjIpCgogICAgZGVmIHNjcmlwdCgpOgogICAgICAgIHRyeToKICAgICAgICAgICAgZW5kID0gdGltZS50aW1lKCkgKyA2MDAKICAgICAgICAgICAgd2hpbGUgYXBwLmVuZ2luZS5zdGF0ZSAhPSAicmVhZHkiIGFuZCB0aW1lLnRpbWUoKSA8IGVuZDogICAjIGZpcnN0IHJ1biBkb3dubG9hZHMgdGhlIG1vZGVsCiAgICAgICAgICAgICAgICB0aW1lLnNsZWVwKDAuNSkKICAgICAgICAgICAgY2hlY2soImVuZ2luZSByZWFkeSIsIGFwcC5lbmdpbmUuc3RhdGUgPT0gInJlYWR5IiwgZiJ7YXBwLmVuZ2luZS5zdGF0ZX0ge2FwcC5sYXN0X21zZ30iKQogICAgICAgICAgICBhcHAuc2V0dXBfYWkoKQogICAgICAgICAgICBjaGVjaygiQUkgZm91bmQiLCBhcHAuYnJhaW4ucmVhZHksIGFwcC5haV9zdGF0dXMpCgogICAgICAgICAgICBwYWQgPSBOb3RlcGFkKCkKICAgICAgICAgICAgcGFkLmZvY3VzKCkKICAgICAgICAgICAgIyBhIHBpY3R1cmUgb24gdGhlIGNsaXBib2FyZCBtdXN0IHN1cnZpdmUgZGljdGF0aW9uCiAgICAgICAgICAgIGRpYiA9ICg0MCkudG9fYnl0ZXMoNCwgImxpdHRsZSIpICsgKDEpLnRvX2J5dGVzKDQsICJsaXR0bGUiKSArICgxKS50b19ieXRlcyg0LCAibGl0dGxlIikgKyBcCiAgICAgICAgICAgICAgICAoMSkudG9fYnl0ZXMoMiwgImxpdHRsZSIpICsgKDMyKS50b19ieXRlcygyLCAibGl0dGxlIikgKyBieXRlcygyMCkgKyBiIlx4MDBceDgwXHhmZlx4MDAiCiAgICAgICAgICAgIHdpdGhfY2xpcCA9IHdpbmNsaXAuX29wZW4oKQogICAgICAgICAgICBpZiB3aXRoX2NsaXA6CiAgICAgICAgICAgICAgICB3aW5jbGlwLnVzZXIzMi5FbXB0eUNsaXBib2FyZCgpCiAgICAgICAgICAgICAgICB3aW5jbGlwLl9wdXQod2luY2xpcC5DRl9ESUIsIGRpYikKICAgICAgICAgICAgICAgIHdpbmNsaXAudXNlcjMyLkNsb3NlQ2xpcGJvYXJkKCkKCiAgICAgICAgICAgIHNheSgiMDFfaGVsbG8iKTsgc2V0dGxlKCkKICAgICAgICAgICAgdCA9IHBhZC50ZXh0KCkKICAgICAgICAgICAgY2hlY2soIndha2Ugd29yZCArIHR5cGluZyIsICJoZWxsbyB3b3JsZCIgaW4gdC5sb3dlcigpLCByZXByKHQpKQogICAgICAgICAgICBjaGVjaygicGljdHVyZSBzdGlsbCBvbiBjbGlwYm9hcmQiLCB3aW5jbGlwLmhhc19mb3JtYXQod2luY2xpcC5DRl9ESUIpLCAiQ0ZfRElCIHByZXNlbnQiKQoKICAgICAgICAgICAgcGFkLmNsZWFyKCk7IHBhZC5mb2N1cygpCiAgICAgICAgICAgIHNheSgiMDJfbm90X2Zvcl91cyIpOyBzZXR0bGUoKQogICAgICAgICAgICBjaGVjaygiaWdub3JlcyBzcGVlY2ggbm90IHN0YXJ0aW5nIHdpdGggU2F5c28iLCBwYWQudGV4dCgpID09ICIiLCByZXByKHBhZC50ZXh0KCkpKQoKICAgICAgICAgICAgcGFkLmNsZWFyKCk7IHBhZC5mb2N1cygpCiAgICAgICAgICAgIHNheSgiMDNfbWVldGluZyIpOyBzZXR0bGUoKQogICAgICAgICAgICBiZWZvcmUgPSBwYWQudGV4dCgpCiAgICAgICAgICAgIGNoZWNrKCJzZWNvbmQgcGhyYXNlIHR5cGVkIiwgIm1lZXRpbmciIGluIGJlZm9yZS5sb3dlcigpLCByZXByKGJlZm9yZSkpCiAgICAgICAgICAgIHNheSgiMDRfZm9ybWFsIik7IHNldHRsZSg0MCkKICAgICAgICAgICAgYWZ0ZXIgPSBwYWQudGV4dCgpCiAgICAgICAgICAgIGNoZWNrKCJBSSByZXdyb3RlIHdoYXQgd2FzIGp1c3QgdHlwZWQiLCBhZnRlci5zdHJpcCgpID09IEFJX0FOU1dFUiwgcmVwcihhZnRlcikpCiAgICAgICAgICAgIGNoZWNrKCJBSSB3YXMgZ2l2ZW4gdGhlIHR5cGVkIHRleHQiLCBGYWtlQUkuc2VlbiBhbmQgIm1lZXRpbmciIGluIEZha2VBSS5zZWVuWy0xXS5sb3dlcigpLAogICAgICAgICAgICAgICAgICBGYWtlQUkuc2VlblstMTpdIGlmIEZha2VBSS5zZWVuIGVsc2UgIm5vIHJlcXVlc3QiKQoKICAgICAgICAgICAgcGFkLmNsZWFyKCk7IHBhZC5mb2N1cygpCiAgICAgICAgICAgIHNheSgiMDVfZGljdGF0aW9uX29uIik7IHNldHRsZSgpCiAgICAgICAgICAgIGNoZWNrKCJkaWN0YXRpb24gbW9kZSBvbiIsIGFwcC5lbmdpbmUuZGljdGF0aW5nLCBhcHAuZW5naW5lLnN0YXRlKQogICAgICAgICAgICBzYXkoIjA2X2RpY3RhdGluZyIpOyBzZXR0bGUoKQogICAgICAgICAgICBzYXkoIjA3X2RpY3RhdGlvbl9vZmYiKTsgc2V0dGxlKCkKICAgICAgICAgICAgdCA9IHBhZC50ZXh0KCkKICAgICAgICAgICAgY2hlY2soImRpY3RhdGlvbiB0eXBlcyB3aXRob3V0IHdha2Ugd29yZCIsICJubyB3YWtlIHdvcmQiIGluIHQubG93ZXIoKSwgcmVwcih0KSkKICAgICAgICAgICAgY2hlY2soImRpY3RhdGlvbiBtb2RlIG9mZiBhZ2FpbiIsIG5vdCBhcHAuZW5naW5lLmRpY3RhdGluZywgYXBwLmVuZ2luZS5zdGF0ZSkKCiAgICAgICAgICAgIHBhZC5jbGVhcigpOyBwYWQuZm9jdXMoKQogICAgICAgICAgICBhcHAuZW5naW5lLnB0dF9wcmVzcygpCiAgICAgICAgICAgIHRpbWUuc2xlZXAoMC41KQogICAgICAgICAgICBzYXkoIjA4X2hvbGQiLCBnYXA9MC4zKQogICAgICAgICAgICBhcHAuZW5naW5lLnB0dF9yZWxlYXNlKCkKICAgICAgICAgICAgc2V0dGxlKCkKICAgICAgICAgICAgdCA9IHBhZC50ZXh0KCkKICAgICAgICAgICAgY2hlY2soImhvbGQgdG8gdGFsayIsICJob2xkIHRvIHRhbGsiIGluIHQubG93ZXIoKSwgcmVwcih0KSkKCiAgICAgICAgICAgIHNheSgiMDlfc2VuZCIpOyBzZXR0bGUoKQogICAgICAgICAgICB0ID0gcGFkLnRleHQoKQogICAgICAgICAgICBjaGVjaygiJ1NheXNvLCBzZW5kJyBwcmVzc2VzIEVudGVyIiwgIlxyXG4iIGluIHQgb3IgIlxuIiBpbiB0LCByZXByKHQpKQoKICAgICAgICAgICAgIyBzd2l0Y2hpbmcgYXBwcyBieSB2b2ljZSwgdGhlbiBkaWN0YXRpbmcgc3RyYWlnaHQgYXdheSAodGhlIEFsdC1rZXkvbWVudS1iYXIgYnVnKQogICAgICAgICAgICBwYWQuY2xlYXIoKQogICAgICAgICAgICB1c2VyMzIuU2V0Rm9yZWdyb3VuZFdpbmRvdyh1c2VyMzIuR2V0U2hlbGxXaW5kb3coKSkKICAgICAgICAgICAgdGltZS5zbGVlcCgwLjUpCiAgICAgICAgICAgIHNheSgiMTBfc3dpdGNoIik7IHNldHRsZSgpCiAgICAgICAgICAgIGNoZWNrKCInc3dpdGNoIHRvIE5vdGVwYWQnIGJyaW5ncyBpdCB0byB0aGUgZnJvbnQiLCB1c2VyMzIuR2V0Rm9yZWdyb3VuZFdpbmRvdygpID09IHBhZC5od25kLAogICAgICAgICAgICAgICAgICBhcHAubGFzdF9tc2cpCiAgICAgICAgICAgIHNheSgiMTFfYWZ0ZXJfc3dpdGNoIik7IHNldHRsZSgpCiAgICAgICAgICAgIHQgPSBwYWQudGV4dCgpCiAgICAgICAgICAgIGNoZWNrKCJ0eXBpbmcgd29ya3MgcmlnaHQgYWZ0ZXIgc3dpdGNoaW5nIiwgImFmdGVyIHN3aXRjaGluZyIgaW4gdC5sb3dlcigpLCByZXByKHQpKQoKICAgICAgICAgICAgIyByZW5hbWluZzogImNhbGwgaXQgYW55dGhpbmcsIHNheSBpdCBvbmNlLCByZWFkeSB0byBkcml2ZSIKICAgICAgICAgICAgYXBwLnVpKGxhbWJkYTogYXBwLnVwZGF0ZV9jZmcod2FrZV93b3JkPSJKYXJ2aXMiKSkKICAgICAgICAgICAgdGltZS5zbGVlcCgxLjUpOyBzZXR0bGUoKQogICAgICAgICAgICBoZWFyZCA9IFtdCiAgICAgICAgICAgIGFwcC5zdGFydF90ZXN0KGhlYXJkLmFwcGVuZCkKICAgICAgICAgICAgcGFkLmNsZWFyKCk7IHBhZC5mb2N1cygpCiAgICAgICAgICAgIHNheSgiMTJfamFydmlzX3Rlc3QiKTsgc2V0dGxlKCkKICAgICAgICAgICAgYXBwLnN0b3BfdGVzdCgpCiAgICAgICAgICAgIGNoZWNrKCJ0ZXN0IG1vZGUgaGVhcnMgdGhlIG5ldyBuYW1lIiwgYm9vbChoZWFyZCksIFsoYS5raW5kLCBhLnRleHQpIGZvciBhIGluIGhlYXJkXSkKICAgICAgICAgICAgY2hlY2soInRlc3QgbW9kZSB0eXBlcyBub3RoaW5nIiwgcGFkLnRleHQoKSA9PSAiIiwgcmVwcihwYWQudGV4dCgpKSkKICAgICAgICAgICAgc2F5KCIxM19qYXJ2aXNfdHlwZSIpOyBzZXR0bGUoKQogICAgICAgICAgICB0ID0gcGFkLnRleHQoKQogICAgICAgICAgICBjaGVjaygibmV3IG5hbWUgdHlwZXMiLCAibmV3IG5hbWUiIGluIHQubG93ZXIoKSwgcmVwcih0KSkKICAgICAgICAgICAgc2F5KCIxNF9vbGRfbmFtZSIpOyBzZXR0bGUoKQogICAgICAgICAgICBjaGVjaygib2xkIG5hbWUgbm8gbG9uZ2VyIHdha2VzIGl0IiwgIm9sZCBuYW1lIiBub3QgaW4gcGFkLnRleHQoKS5sb3dlcigpLCByZXByKHBhZC50ZXh0KCkpKQoKICAgICAgICAgICAgY2hlY2soImhpc3RvcnkgcmVjb3JkZWQiLCBsZW4oYXBwLmhpc3RvcnkpID49IDMsIGxlbihhcHAuaGlzdG9yeSkpCiAgICAgICAgICAgIHBhZC5jbG9zZSgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICBpbXBvcnQgdHJhY2ViYWNrCiAgICAgICAgICAgIHRyYWNlYmFjay5wcmludF9leGMoKQogICAgICAgICAgICBmYWlsdXJlcy5hcHBlbmQoZiJjcmFzaGVkOiB7ZX0iKQogICAgICAgIGZpbmFsbHk6CiAgICAgICAgICAgIGFwcC51aShhcHAucXVpdCkKCiAgICBhcHAuZW5naW5lLnN0YXJ0KCkKICAgIHRocmVhZGluZy5UaHJlYWQodGFyZ2V0PXNjcmlwdCwgZGFlbW9uPVRydWUpLnN0YXJ0KCkKICAgIGFwcC53aW5kb3cud2l0aGRyYXcoKQogICAgYXBwLndpbmRvdy5hZnRlcig1MCwgYXBwLl9wdW1wKQogICAgYXBwLndpbmRvdy5hZnRlcigyMDAsIGFwcC53aW5kb3cuYnViYmxlLmJ1aWxkKQogICAgYXBwLndpbmRvdy5tYWlubG9vcCgpCgogICAgcHJpbnQoIlxuPT09PSBTYXlzbyBlbmQtdG8tZW5kOiIsIGxlbihyZXN1bHRzKSAtIGxlbihmYWlsdXJlcyksICJvZiIsIGxlbihyZXN1bHRzKSwgImNoZWNrcyBwYXNzZWQgPT09PSIpCiAgICBpZiBmYWlsdXJlczoKICAgICAgICBwcmludCgiRkFJTEVEOiIsIGZhaWx1cmVzKQogICAgICAgIGxvZyA9IHByb2ZpbGUgLyAiU2F5c28iIC8gInNheXNvLmxvZyIKICAgICAgICBpZiBsb2cuZXhpc3RzKCk6CiAgICAgICAgICAgIHByaW50KCItLS0tIHNheXNvLmxvZyAobGFzdCA4MCBsaW5lcykgLS0tLSIpCiAgICAgICAgICAgIHByaW50KCJcbiIuam9pbihsb2cucmVhZF90ZXh0KGVuY29kaW5nPSJ1dGYtOCIsIGVycm9ycz0icmVwbGFjZSIpLnNwbGl0bGluZXMoKVstODA6XSkpCiAgICByZXR1cm4gMSBpZiBmYWlsdXJlcyBlbHNlIDAKCgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgbW9kZSwgZm9sZGVyID0gc3lzLmFyZ3ZbMV0sIFBhdGgoc3lzLmFyZ3ZbMl0pCiAgICBpZiBtb2RlID09ICItLW1ha2Utd2F2cyI6CiAgICAgICAgbWFrZV93YXZzKGZvbGRlcikKICAgIGVsc2U6CiAgICAgICAgc3lzLmV4aXQocnVuKGZvbGRlcikpCg==
+"""End-to-end test on real Windows (run by CI on a Windows machine; not part of the normal pytest run).
+
+    python tests/e2e_windows.py --make-wavs DIR     speak the test phrases with the Windows voice
+    python tests/e2e_windows.py --run DIR           drive the real app with them
+
+The real App runs: speech (Windows' own voice, not a person) -> the real Whisper model -> wake word
+-> commands -> text cleanup -> clipboard paste -> keystrokes into a real Notepad window. Only the
+microphone is replaced: the recorded phrases are fed in where mic audio would arrive.
+An AI server is faked locally so "make that more formal" can be checked without an API key.
+"""
+import ctypes
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+import wave
+from ctypes import wintypes
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
+
+PHRASES = {
+    # file name: what the Windows voice says ("Say-so" is how the wake word is spoken)
+    "01_hello": "Say-so, hello world.",
+    "02_not_for_us": "Say something nice about the weather today.",
+    "03_meeting": "Say-so, the meeting is at five.",
+    "04_formal": "Say-so, make that more formal.",
+    "05_dictation_on": "Say-so, start dictation.",
+    "06_dictating": "This sentence has no wake word at all.",
+    "07_dictation_off": "Stop dictation.",
+    "08_hold": "This was typed with hold to talk.",
+    "09_send": "Say-so, send.",
+    "10_switch": "Say-so, switch to Notepad.",
+    "11_after_switch": "Say-so, typed right after switching.",
+    "12_jarvis_test": "Jarvis, hello.",
+    "13_jarvis_type": "Jarvis, typed with a new name.",
+    "14_old_name": "Say-so, the old name should do nothing.",
+}
+AI_ANSWER = "The meeting is scheduled for 5 PM."
+
+
+def make_wavs(folder: Path):
+    folder.mkdir(parents=True, exist_ok=True)
+    lines = ["Add-Type -AssemblyName System.Speech",
+             "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer",
+             "$s.Rate = -1",
+             "$f = New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(16000, "
+             "[System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen, [System.Speech.AudioFormat.AudioChannel]::Mono)"]
+    for name, text in PHRASES.items():
+        lines += [f"$s.SetOutputToWaveFile('{folder / (name + '.wav')}', $f)", f"$s.Speak(\"{text}\")"]
+    lines.append("$s.SetOutputToNull()")
+    subprocess.run(["powershell", "-NoProfile", "-Command", "; ".join(lines)], check=True)
+    print("made", len(list(folder.glob("*.wav"))), "phrases")
+
+
+# ---------------------------------------------------------------- Notepad helpers
+user32 = ctypes.windll.user32
+user32.FindWindowW.restype = wintypes.HWND
+user32.FindWindowExW.restype = wintypes.HWND
+user32.FindWindowExW.argtypes = [wintypes.HWND, wintypes.HWND, wintypes.LPCWSTR, wintypes.LPCWSTR]
+user32.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+user32.SendMessageW.restype = ctypes.c_ssize_t
+user32.GetShellWindow.restype = wintypes.HWND
+WM_SETTEXT, WM_GETTEXT, WM_GETTEXTLENGTH = 0x000C, 0x000D, 0x000E
+
+
+class Notepad:
+    def __init__(self):
+        self.proc = subprocess.Popen(["notepad.exe"])
+        for _ in range(100):
+            self.hwnd = user32.FindWindowW("Notepad", None)
+            if self.hwnd:
+                break
+            time.sleep(0.1)
+        assert self.hwnd, "Notepad didn't open"
+        self.edit = user32.FindWindowExW(self.hwnd, None, "Edit", None) or \
+            user32.FindWindowExW(self.hwnd, None, "RichEditD2DPT", None)
+        assert self.edit, "Notepad's text box not found"
+
+    def focus(self):
+        from sayso.actions_win import _focus
+        _focus(self.hwnd)
+        time.sleep(0.3)
+
+    def text(self) -> str:
+        n = user32.SendMessageW(self.edit, WM_GETTEXTLENGTH, 0, 0)
+        buf = ctypes.create_unicode_buffer(n + 1)
+        user32.SendMessageW(self.edit, WM_GETTEXT, n + 1, ctypes.addressof(buf))
+        return buf.value
+
+    def clear(self):
+        buf = ctypes.create_unicode_buffer("")
+        user32.SendMessageW(self.edit, WM_SETTEXT, 0, ctypes.addressof(buf))
+
+    def close(self):
+        self.proc.kill()
+
+
+# ---------------------------------------------------------------- fake AI server (OpenAI-style)
+class FakeAI(BaseHTTPRequestHandler):
+    seen = []
+
+    def do_POST(self):
+        body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+        FakeAI.seen.append(body["messages"][-1]["content"])
+        data = json.dumps({"choices": [{"message": {"content": AI_ANSWER}}]}).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(data)
+
+    def log_message(self, *a):
+        pass
+
+
+def run(folder: Path) -> int:
+    profile = Path(tempfile.mkdtemp())
+    os.environ["APPDATA"] = str(profile)
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    server = HTTPServer(("127.0.0.1", 0), FakeAI)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+
+    import numpy as np
+    from sayso import winclip
+    from sayso.config import Config
+    from sayso.engine import CHUNK
+    Config(first_run_done=True, beeps=False, ai_provider="lmstudio", ai_model="fake-model",
+           ai_base_url=f"http://127.0.0.1:{server.server_port}/v1", show_bubble=True).save()
+    from sayso.app import App, setup_logging
+    setup_logging()
+    app = App()
+    app.engine._open_mic = lambda rescan=False: None   # the recorded phrases stand in for the mic
+    results, failures = [], []
+
+    def check(name, cond, detail):
+        results.append((name, bool(cond), detail))
+        if not cond:
+            failures.append(name)
+        print(("PASS " if cond else "FAIL ") + name + " | " + str(detail)[:300], flush=True)
+
+    def audio(name):
+        with wave.open(str(folder / f"{name}.wav")) as w:
+            a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16)
+        return [a[i:i + CHUNK] for i in range(0, len(a) - CHUNK, CHUNK)]
+
+    def say(name, gap=1.6):
+        for c in audio(name) + [np.zeros(CHUNK, np.int16)] * int(gap * 16000 / CHUNK):
+            app.engine.audio.put(c)
+            time.sleep(0.02)
+
+    def settle(secs=20):
+        """Wait until the engine has finished with everything it heard."""
+        end = time.time() + secs
+        time.sleep(0.5)
+        while time.time() < end:
+            if app.engine.audio.empty() and app.engine.state in ("ready", "dictating", "paused"):
+                time.sleep(1.0)
+                if app.engine.audio.empty() and app.engine.state in ("ready", "dictating", "paused"):
+                    return
+            time.sleep(0.2)
+
+    def script():
+        try:
+            end = time.time() + 600
+            while app.engine.state != "ready" and time.time() < end:   # first run downloads the model
+                time.sleep(0.5)
+            check("engine ready", app.engine.state == "ready", f"{app.engine.state} {app.last_msg}")
+            app.setup_ai()
+            check("AI found", app.brain.ready, app.ai_status)
+
+            pad = Notepad()
+            pad.focus()
+            # a picture on the clipboard must survive dictation
+            dib = (40).to_bytes(4, "little") + (1).to_bytes(4, "little") + (1).to_bytes(4, "little") + \
+                (1).to_bytes(2, "little") + (32).to_bytes(2, "little") + bytes(20) + b"\x00\x80\xff\x00"
+            with_clip = winclip._open()
+            if with_clip:
+                winclip.user32.EmptyClipboard()
+                winclip._put(winclip.CF_DIB, dib)
+                winclip.user32.CloseClipboard()
+
+            say("01_hello"); settle()
+            t = pad.text()
+            check("wake word + typing", "hello world" in t.lower(), repr(t))
+            check("picture still on clipboard", winclip.has_format(winclip.CF_DIB), "CF_DIB present")
+
+            pad.clear(); pad.focus()
+            say("02_not_for_us"); settle()
+            check("ignores speech not starting with Sayso", pad.text() == "", repr(pad.text()))
+
+            pad.clear(); pad.focus()
+            say("03_meeting"); settle()
+            before = pad.text()
+            check("second phrase typed", "meeting" in before.lower(), repr(before))
+            say("04_formal"); settle(40)
+            after = pad.text()
+            check("AI rewrote what was just typed", after.strip() == AI_ANSWER, repr(after))
+            check("AI was given the typed text", FakeAI.seen and "meeting" in FakeAI.seen[-1].lower(),
+                  FakeAI.seen[-1:] if FakeAI.seen else "no request")
+
+            pad.clear(); pad.focus()
+            say("05_dictation_on"); settle()
+            check("dictation mode on", app.engine.dictating, app.engine.state)
+            say("06_dictating"); settle()
+            say("07_dictation_off"); settle()
+            t = pad.text()
+            check("dictation types without wake word", "no wake word" in t.lower(), repr(t))
+            check("dictation mode off again", not app.engine.dictating, app.engine.state)
+
+            pad.clear(); pad.focus()
+            app.engine.ptt_press()
+            time.sleep(0.5)
+            say("08_hold", gap=0.3)
+            app.engine.ptt_release()
+            settle()
+            t = pad.text()
+            check("hold to talk", "hold to talk" in t.lower(), repr(t))
+
+            say("09_send"); settle()
+            t = pad.text()
+            check("'Sayso, send' presses Enter", "\r\n" in t or "\n" in t, repr(t))
+
+            # switching apps by voice, then dictating straight away (the Alt-key/menu-bar bug)
+            pad.clear()
+            user32.SetForegroundWindow(user32.GetShellWindow())
+            time.sleep(0.5)
+            say("10_switch"); settle()
+            check("'switch to Notepad' brings it to the front", user32.GetForegroundWindow() == pad.hwnd,
+                  app.last_msg)
+            say("11_after_switch"); settle()
+            t = pad.text()
+            check("typing works right after switching", "after switching" in t.lower(), repr(t))
+
+            # renaming: "call it anything, say it once, ready to drive"
+            app.ui(lambda: app.update_cfg(wake_word="Jarvis"))
+            time.sleep(1.5); settle()
+            heard = []
+            app.start_test(heard.append)
+            pad.clear(); pad.focus()
+            say("12_jarvis_test"); settle()
+            app.stop_test()
+            check("test mode hears the new name", bool(heard), [(a.kind, a.text) for a in heard])
+            check("test mode types nothing", pad.text() == "", repr(pad.text()))
+            say("13_jarvis_type"); settle()
+            t = pad.text()
+            check("new name types", "new name" in t.lower(), repr(t))
+            say("14_old_name"); settle()
+            check("old name no longer wakes it", "old name" not in pad.text().lower(), repr(pad.text()))
+
+            check("history recorded", len(app.history) >= 3, len(app.history))
+            pad.close()
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            failures.append(f"crashed: {e}")
+        finally:
+            app.ui(app.quit)
+
+    app.engine.start()
+    threading.Thread(target=script, daemon=True).start()
+    app.window.withdraw()
+    app.window.after(50, app._pump)
+    app.window.after(200, app.window.bubble.build)
+    app.window.mainloop()
+
+    print("\n==== Sayso end-to-end:", len(results) - len(failures), "of", len(results), "checks passed ====")
+    if failures:
+        print("FAILED:", failures)
+        log = profile / "Sayso" / "sayso.log"
+        if log.exists():
+            print("---- sayso.log (last 80 lines) ----")
+            print("\n".join(log.read_text(encoding="utf-8", errors="replace").splitlines()[-80:]))
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    mode, folder = sys.argv[1], Path(sys.argv[2])
+    if mode == "--make-wavs":
+        make_wavs(folder)
+    else:
+        sys.exit(run(folder))

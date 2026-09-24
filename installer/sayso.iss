@@ -1,1 +1,66 @@
-OyBJbm5vIFNldHVwIHNjcmlwdCAtIGJ1aWxkcyBTYXlzb1NldHVwLmV4ZSBmcm9tIHRoZSBQeUluc3RhbGxlciBvdXRwdXQgaW4gZGlzdFxTYXlzbw0KI2lmbmRlZiBBcHBWZXJzaW9uDQogICNkZWZpbmUgQXBwVmVyc2lvbiAiMC41LjIiDQojZW5kaWYNCg0KW1NldHVwXQ0KQXBwSWQ9e3s4RjNDMkExRS01QjdELTRFOUEtOUMxRi01QTdFMkQzQjRDNjB9DQpBcHBOYW1lPVNheXNvDQpBcHBWZXJzaW9uPXsjQXBwVmVyc2lvbn0NCkFwcFB1Ymxpc2hlcj1HZWFyV2l0aEFJDQpEZWZhdWx0RGlyTmFtZT17bG9jYWxhcHBkYXRhfVxQcm9ncmFtc1xTYXlzbw0KRGVmYXVsdEdyb3VwTmFtZT1TYXlzbw0KRGlzYWJsZVByb2dyYW1Hcm91cFBhZ2U9eWVzDQpEaXNhYmxlRGlyUGFnZT15ZXMNCjsgUGVyLXVzZXIgaW5zdGFsbDogbm8gYWRtaW4gcHJvbXB0DQpQcml2aWxlZ2VzUmVxdWlyZWQ9bG93ZXN0DQpPdXRwdXREaXI9Li5cZGlzdA0KT3V0cHV0QmFzZUZpbGVuYW1lPVNheXNvU2V0dXANClNldHVwSWNvbkZpbGU9Li5cc2F5c29cc2F5c28uaWNvDQpVbmluc3RhbGxEaXNwbGF5SWNvbj17YXBwfVxTYXlzby5leGUNCkNvbXByZXNzaW9uPWx6bWEyL21heA0KU29saWRDb21wcmVzc2lvbj15ZXMNCldpemFyZFN0eWxlPW1vZGVybg0KRGlzYWJsZVdlbGNvbWVQYWdlPXllcw0KRGlzYWJsZVJlYWR5UGFnZT15ZXMNCkFwcFB1Ymxpc2hlclVSTD1odHRwczovL2dlYXJ3aXRoYWkuZ2l0aHViLmlvL3NheXNvLw0KQXJjaGl0ZWN0dXJlc0FsbG93ZWQ9eDY0Y29tcGF0aWJsZQ0KQXJjaGl0ZWN0dXJlc0luc3RhbGxJbjY0Qml0TW9kZT14NjRjb21wYXRpYmxlDQpDbG9zZUFwcGxpY2F0aW9ucz1mb3JjZQ0KDQpbVGFza3NdDQpOYW1lOiAiZGVza3RvcGljb24iOyBEZXNjcmlwdGlvbjogIkNyZWF0ZSBhIGRlc2t0b3Agc2hvcnRjdXQiOyBHcm91cERlc2NyaXB0aW9uOiAiT3B0aW9uczoiOyBGbGFnczogdW5jaGVja2VkDQoNCltGaWxlc10NClNvdXJjZTogIi4uXGRpc3RcU2F5c29cKiI7IERlc3REaXI6ICJ7YXBwfSI7IEZsYWdzOiByZWN1cnNlc3ViZGlycyBpZ25vcmV2ZXJzaW9uDQoNCltJY29uc10NCk5hbWU6ICJ7Z3JvdXB9XFNheXNvIjsgRmlsZW5hbWU6ICJ7YXBwfVxTYXlzby5leGUiDQpOYW1lOiAie2F1dG9kZXNrdG9wfVxTYXlzbyI7IEZpbGVuYW1lOiAie2FwcH1cU2F5c28uZXhlIjsgVGFza3M6IGRlc2t0b3BpY29uDQoNCltSdW5dDQpGaWxlbmFtZTogInthcHB9XFNheXNvLmV4ZSI7IERlc2NyaXB0aW9uOiAiTGF1bmNoIFNheXNvIG5vdyI7IEZsYWdzOiBub3dhaXQgcG9zdGluc3RhbGwgc2tpcGlmc2lsZW50DQoNCltVbmluc3RhbGxSdW5dDQpGaWxlbmFtZTogInRhc2traWxsIjsgUGFyYW1ldGVyczogIi9JTSBTYXlzby5leGUgL0YiOyBGbGFnczogcnVuaGlkZGVuOyBSdW5PbmNlSWQ6ICJLaWxsU2F5c28iDQoNCltVbmluc3RhbGxEZWxldGVdDQo7IFNldHRpbmdzIGFuZCBkb3dubG9hZGVkIG1vZGVscyBsaXZlIGluICVBUFBEQVRBJVxTYXlzbw0KVHlwZTogZmlsZXNhbmRvcmRpcnM7IE5hbWU6ICJ7dXNlcmFwcGRhdGF9XFNheXNvIg0KDQpbQ29kZV0NCi8vIENsb3NlIGEgcnVubmluZyBTYXlzbyBiZWZvcmUgZmlsZXMgYXJlIHJlcGxhY2VkIChpdCBsaXZlcyBpbiB0aGUgdHJheSwgc28gYXNrIGl0IGZpcm1seSkNCmZ1bmN0aW9uIFByZXBhcmVUb0luc3RhbGwodmFyIE5lZWRzUmVzdGFydDogQm9vbGVhbik6IFN0cmluZzsNCnZhcg0KICBDb2RlOiBJbnRlZ2VyOw0KYmVnaW4NCiAgRXhlYyhFeHBhbmRDb25zdGFudCgne3N5c31cdGFza2tpbGwuZXhlJyksICcvRiAvSU0gU2F5c28uZXhlJywgJycsIFNXX0hJREUsIGV3V2FpdFVudGlsVGVybWluYXRlZCwgQ29kZSk7DQogIFNsZWVwKDUwMCk7DQogIFJlc3VsdCA6PSAnJzsNCmVuZDsNCg0KcHJvY2VkdXJlIEN1clVuaW5zdGFsbFN0ZXBDaGFuZ2VkKEN1clVuaW5zdGFsbFN0ZXA6IFRVbmluc3RhbGxTdGVwKTsNCmJlZ2luDQogIGlmIEN1clVuaW5zdGFsbFN0ZXAgPSB1c1Bvc3RVbmluc3RhbGwgdGhlbg0KICAgIFJlZ0RlbGV0ZVZhbHVlKEhLRVlfQ1VSUkVOVF9VU0VSLCAnU29mdHdhcmVcTWljcm9zb2Z0XFdpbmRvd3NcQ3VycmVudFZlcnNpb25cUnVuJywgJ1NheXNvJyk7DQplbmQ7DQo=
+; Inno Setup script - builds SaysoSetup.exe from the PyInstaller output in dist\Sayso
+#ifndef AppVersion
+  #define AppVersion "0.5.2"
+#endif
+
+[Setup]
+AppId={{8F3C2A1E-5B7D-4E9A-9C1F-5A7E2D3B4C60}
+AppName=Sayso
+AppVersion={#AppVersion}
+AppPublisher=GearWithAI
+DefaultDirName={localappdata}\Programs\Sayso
+DefaultGroupName=Sayso
+DisableProgramGroupPage=yes
+DisableDirPage=yes
+; Per-user install: no admin prompt
+PrivilegesRequired=lowest
+OutputDir=..\dist
+OutputBaseFilename=SaysoSetup
+SetupIconFile=..\sayso\sayso.ico
+UninstallDisplayIcon={app}\Sayso.exe
+Compression=lzma2/max
+SolidCompression=yes
+WizardStyle=modern
+DisableWelcomePage=yes
+DisableReadyPage=yes
+AppPublisherURL=https://gearwithai.github.io/sayso/
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+CloseApplications=force
+
+[Tasks]
+Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Options:"; Flags: unchecked
+
+[Files]
+Source: "..\dist\Sayso\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
+
+[Icons]
+Name: "{group}\Sayso"; Filename: "{app}\Sayso.exe"
+Name: "{autodesktop}\Sayso"; Filename: "{app}\Sayso.exe"; Tasks: desktopicon
+
+[Run]
+Filename: "{app}\Sayso.exe"; Description: "Launch Sayso now"; Flags: nowait postinstall skipifsilent
+
+[UninstallRun]
+Filename: "taskkill"; Parameters: "/IM Sayso.exe /F"; Flags: runhidden; RunOnceId: "KillSayso"
+
+[UninstallDelete]
+; Settings and downloaded models live in %APPDATA%\Sayso
+Type: filesandordirs; Name: "{userappdata}\Sayso"
+
+[Code]
+// Close a running Sayso before files are replaced (it lives in the tray, so ask it firmly)
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  Code: Integer;
+begin
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM Sayso.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  Sleep(500);
+  Result := '';
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usPostUninstall then
+    RegDeleteValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Run', 'Sayso');
+end;

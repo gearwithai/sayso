@@ -1,1 +1,3 @@
-IiIiU2F5c28gLSBoYW5kcy1mcmVlIHZvaWNlIHR5cGluZyBmb3IgV2luZG93cy4iIiIKX192ZXJzaW9uX18gPSAiMC41LjIiCkFQUF9OQU1FID0gIlNheXNvIgo=
+"""Sayso - hands-free voice typing for Windows."""
+__version__ = "0.5.2"
+APP_NAME = "Sayso"

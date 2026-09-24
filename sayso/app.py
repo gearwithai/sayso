@@ -1,1 +1,438 @@
-IiIiRW50cnkgcG9pbnQ6IHRyYXkgaWNvbiArIGVuZ2luZSArIHdpbmRvdywgd2lyZWQgdG9nZXRoZXIuIiIiCmltcG9ydCBqc29uCmltcG9ydCBsb2dnaW5nCmltcG9ydCByZQppbXBvcnQgdGltZQppbXBvcnQgcXVldWUKaW1wb3J0IHN5cwppbXBvcnQgdGhyZWFkaW5nCmltcG9ydCB1cmxsaWIucmVxdWVzdAppbXBvcnQgd2ViYnJvd3Nlcgpmcm9tIGRhdGFjbGFzc2VzIGltcG9ydCByZXBsYWNlCmZyb20gbG9nZ2luZy5oYW5kbGVycyBpbXBvcnQgUm90YXRpbmdGaWxlSGFuZGxlcgoKZnJvbSBzYXlzbyBpbXBvcnQgQVBQX05BTUUsIF9fdmVyc2lvbl9fCmZyb20gc2F5c28uY29uZmlnIGltcG9ydCBDb25maWcsIGRhdGFfZGlyCgpsb2cgPSBsb2dnaW5nLmdldExvZ2dlcigic2F5c28iKQoKUkVQTyA9ICJnZWFyd2l0aGFpL3NheXNvIgpET1dOTE9BRF9QQUdFID0gImh0dHBzOi8vZ2VhcndpdGhhaS5naXRodWIuaW8vc2F5c28vIgpFTkdJTkVfS0VZUyA9IHsiaGFuZHNfZnJlZSIsICJ3YWtlX3dvcmQiLCAic3R0X21vZGVsIiwgIm1pY19kZXZpY2UiLCAic2lsZW5jZV9sZXZlbCIsICJzaWxlbmNlX3NlY3MiLCAic2VuZF93b3JkIiwKICAgICAgICAgICAgICAgImJlZXBzIiwgIm1heF9zZWNzIiwgImxhbmd1YWdlIiwgInVzZV9jdWRhIiwgIm1pY19uYW1lIn0KQUlfS0VZUyA9IHsiYWlfcHJvdmlkZXIiLCAiYWlfbW9kZWwiLCAiYWlfYmFzZV91cmwiLCAiYWlfa2V5In0KQ09OVElOVUVfU0VDUyA9IDQ1ICAgICAgICAjIGNhcnJ5IGEgc2VudGVuY2Ugb24gaWYgeW91IHNwZWFrIGFnYWluIGluIHRoZSBzYW1lIHdpbmRvdyB3aXRoaW4gdGhpcyB0aW1lCkVESVRfTEFTVF9TRUNTID0gMzAwICAgICAgIyAibWFrZSB0aGF0IG1vcmUgZm9ybWFsIiB3b3JrcyBvbiB3aGF0IFNheXNvIGxhc3QgdHlwZWQgZm9yIHRoaXMgbG9uZwpISVNUT1JZX01BWCA9IDUwCgoKZGVmIHNldHVwX2xvZ2dpbmcoKToKICAgIGggPSBSb3RhdGluZ0ZpbGVIYW5kbGVyKGRhdGFfZGlyKCkgLyAic2F5c28ubG9nIiwgbWF4Qnl0ZXM9MV8wMDBfMDAwLCBiYWNrdXBDb3VudD0yLCBlbmNvZGluZz0idXRmLTgiKQogICAgaC5zZXRGb3JtYXR0ZXIobG9nZ2luZy5Gb3JtYXR0ZXIoIiUoYXNjdGltZSlzICUobGV2ZWxuYW1lKXMgJShuYW1lKXM6ICUobWVzc2FnZSlzIikpCiAgICBsb2dnaW5nLmJhc2ljQ29uZmlnKGxldmVsPWxvZ2dpbmcuSU5GTywgaGFuZGxlcnM9W2hdKQogICAgaWYgc3lzLnN0ZGVycjogICMgcnVubmluZyBmcm9tIGEgdGVybWluYWwKICAgICAgICBsb2dnaW5nLmdldExvZ2dlcigpLmFkZEhhbmRsZXIobG9nZ2luZy5TdHJlYW1IYW5kbGVyKCkpCiAgICBzeXMuZXhjZXB0aG9vayA9IGxhbWJkYSAqYTogbG9nLmNyaXRpY2FsKCJjcmFzaCIsIGV4Y19pbmZvPWEpCgoKZGVmIHZlcnNpb25fdHVwbGUodjogc3RyKToKICAgIHJldHVybiB0dXBsZShpbnQoeCkgZm9yIHggaW4gdi5sc3RyaXAoInYiKS5zcGxpdCgiLiIpIGlmIHguaXNkaWdpdCgpKQoKCmNsYXNzIEFwcDoKICAgIGRlZiBfX2luaXRfXyhzZWxmKToKICAgICAgICBpbXBvcnQgcHlzdHJheQogICAgICAgIGZyb20gc2F5c28gaW1wb3J0IGFjdGlvbnNfd2luLCBhcHBzLCB3aW51dGlsCiAgICAgICAgZnJvbSBzYXlzby5lbmdpbmUgaW1wb3J0IEVuZ2luZQogICAgICAgIGZyb20gc2F5c28uaG90a2V5IGltcG9ydCBQdXNoVG9UYWxrCiAgICAgICAgZnJvbSBzYXlzby5pY29ucyBpbXBvcnQgbWljX2ljb24KICAgICAgICBmcm9tIHNheXNvLnVpIGltcG9ydCBNYWluV2luZG93LCBTVEFUVVMKICAgICAgICBmcm9tIHNheXNvLmNvbW1hbmRzIGltcG9ydCBBY3Rpb24sIHBhcnNlCiAgICAgICAgZnJvbSBzYXlzby5jdXN0b20gaW1wb3J0IEN1c3RvbUNvbW1hbmRzCiAgICAgICAgZnJvbSBzYXlzby50ZXh0IGltcG9ydCBjbGVhbiwgY29udGludWVfc2VudGVuY2UsIHN0eWxlX2ZvcgogICAgICAgIHNlbGYuc3R5bGVfZm9yID0gc3R5bGVfZm9yCiAgICAgICAgZnJvbSBzYXlzbyBpbXBvcnQgYWkKCiAgICAgICAgc2VsZi5weXN0cmF5LCBzZWxmLndpbnV0aWwsIHNlbGYubWljX2ljb24sIHNlbGYuYXBwc19tb2QsIHNlbGYuU1RBVFVTID0gcHlzdHJheSwgd2ludXRpbCwgbWljX2ljb24sIGFwcHMsIFNUQVRVUwogICAgICAgIHNlbGYuYWksIHNlbGYuYWN0aW9ucyA9IGFpLCBhY3Rpb25zX3dpbgogICAgICAgIHNlbGYuYnJhaW4gPSBhaS5CcmFpbigib2ZmIiwgIiIsICIiKQogICAgICAgIHNlbGYuYWlfc3RhdHVzID0gIkFJIGlzIG9mZiIKICAgICAgICBzZWxmLmNmZyA9IENvbmZpZy5sb2FkKCkKICAgICAgICBpZiBub3Qgc2VsZi5jZmcuZmlyc3RfcnVuX2RvbmU6CiAgICAgICAgICAgIHNlbGYuX3NldF9hdXRvc3RhcnQoVHJ1ZSkgICMgb24gYnkgZGVmYXVsdCwgc28gdGhlcmUncyBub3RoaW5nIHRvIHNldCB1cCBhZ2FpbgogICAgICAgIGVsc2U6CiAgICAgICAgICAgIHNlbGYuY2ZnLmxhdW5jaF9hdF9zdGFydHVwID0gd2ludXRpbC5hdXRvc3RhcnRfZW5hYmxlZCgpCiAgICAgICAgc2VsZi5hcHBzID0gYXBwcy5sb2FkX2NhY2hlZCgpCiAgICAgICAgc2VsZi5zY2FubmluZyA9IEZhbHNlCiAgICAgICAgc2VsZi5zdGF0ZSwgc2VsZi5sYXN0X21zZywgc2VsZi51cGRhdGVfdXJsID0gImxvYWRpbmciLCAiIiwgTm9uZQogICAgICAgIHNlbGYuX3VpOiAicXVldWUuUXVldWUiID0gcXVldWUuUXVldWUoKQogICAgICAgIHNlbGYuY3VzdG9tID0gQ3VzdG9tQ29tbWFuZHMoKQogICAgICAgIHNlbGYuaGlzdG9yeSA9IHNlbGYuX2xvYWRfaGlzdG9yeSgpCgogICAgICAgIGRlZiBwYXJzZXIodGV4dCwgYWxsb3dfY29tbWFuZHMpOgogICAgICAgICAgICByZXR1cm4gcGFyc2UodGV4dCwgc2VsZi5jZmcuc2VuZF93b3JkLCBhbGxvd19jb21tYW5kcz1hbGxvd19jb21tYW5kcywKICAgICAgICAgICAgICAgICAgICAgICAgIHNuaXBwZXRzPXNlbGYuY2ZnLnNuaXBwZXRzLCBjdXN0b209bGlzdChzZWxmLmN1c3RvbS5nZXQoKSksIGFpX3JlYWR5PXNlbGYuYnJhaW4ucmVhZHkpCgogICAgICAgIGRlZiBwZXJmb3JtKGEpOgogICAgICAgICAgICBsaXN0ZW5lciA9IHNlbGYudGVzdF9saXN0ZW5lcgogICAgICAgICAgICBpZiBsaXN0ZW5lciBpcyBub3QgTm9uZTogICAjICJ0cnkgeW91ciB3YWtlIHdvcmQiOiBzaG93IHdoYXQgd2FzIGhlYXJkIGluc3RlYWQgb2YgdHlwaW5nIGl0CiAgICAgICAgICAgICAgICBzZWxmLnVpKGxhbWJkYTogbGlzdGVuZXIoYSkpCiAgICAgICAgICAgICAgICByZXR1cm4gIkhlYXJkIHlvdSEiCiAgICAgICAgICAgIGlmIGEua2luZCBpbiAoInR5cGUiLCAidHlwZV9zZW5kIik6CiAgICAgICAgICAgICAgICBleGUsIGh3bmQgPSBzZWxmLl9mb3JlZ3JvdW5kKCkKICAgICAgICAgICAgICAgIHN0eWxlID0gc3R5bGVfZm9yKGV4ZSkgaWYgc2VsZi5jZmcuc21hcnRfZm9ybWF0IGVsc2UgIm5vcm1hbCIKICAgICAgICAgICAgICAgIHRleHQgPSBjbGVhbihhLnRleHQsIHNlbGYuY2ZnLnJlcGxhY2VtZW50cywgc2VsZi5jZmcuY2xlYW51cCwgc3R5bGUpCiAgICAgICAgICAgICAgICAjIGRpZCB0aGUgc2VudGVuY2UgcmVhbGx5IGVuZD8gKGNoYXQgc3R5bGUgaGlkZXMgdGhlIGZpbmFsIGZ1bGwgc3RvcCkKICAgICAgICAgICAgICAgIGVuZGVkID0gYm9vbChyZS5zZWFyY2gociJbLj8hOl1ccyokIiwgY2xlYW4oYS50ZXh0LCBOb25lLCBzZWxmLmNmZy5jbGVhbnVwKSkpCiAgICAgICAgICAgICAgICBpZiAoc2VsZi5jZmcuc21hcnRfY29udGludWUgYW5kIHN0eWxlICE9ICJ0ZXJtaW5hbCIgYW5kIGh3bmQgPT0gc2VsZi5fbGFzdF9od25kCiAgICAgICAgICAgICAgICAgICAgICAgIGFuZCB0aW1lLnRpbWUoKSAtIHNlbGYuX2xhc3RfdGltZSA8IENPTlRJTlVFX1NFQ1MgYW5kIG5vdCBzZWxmLl9sYXN0X2VuZGVkKToKICAgICAgICAgICAgICAgICAgICB0ZXh0ID0gY29udGludWVfc2VudGVuY2UodGV4dCwgc2VsZi5fbGFzdF90eXBlZCkKICAgICAgICAgICAgICAgIGEgPSBBY3Rpb24oYS5raW5kLCB0ZXh0KQogICAgICAgICAgICAgICAgbXNnID0gYWN0aW9uc193aW4ucGVyZm9ybShhLCBzZWxmLmFwcHMsIHNlbGYuY3VzdG9tLmdldCgpKQogICAgICAgICAgICAgICAgc2VsZi5fcmVtZW1iZXIodGV4dCArICgiICIgaWYgYS5raW5kID09ICJ0eXBlIiBlbHNlICIiKSwgaHduZCwgc2VudD1hLmtpbmQgPT0gInR5cGVfc2VuZCIpCiAgICAgICAgICAgICAgICBzZWxmLl9sYXN0X2VuZGVkID0gZW5kZWQKICAgICAgICAgICAgICAgIHJldHVybiBtc2cKICAgICAgICAgICAgaWYgYS5raW5kIGluICgiYWlfZWRpdCIsICJhaV93cml0ZSIpOgogICAgICAgICAgICAgICAgcmV0dXJuIHNlbGYucnVuX2FpKGEpCiAgICAgICAgICAgIGlmIGEua2luZCA9PSAidWkiOgogICAgICAgICAgICAgICAgc2VsZi51aShsYW1iZGE6IHNlbGYud2luZG93LnNob3dfdGFiKGEudGV4dCkpCiAgICAgICAgICAgICAgICByZXR1cm4gZiJPcGVuZWQge2EudGV4dH0iCiAgICAgICAgICAgIGlmIGEua2luZCBpbiAoInNlbmQiLCAibmV3bGluZSIpOgogICAgICAgICAgICAgICAgc2VsZi5fbGFzdF90aW1lID0gMCAgICAgIyBhIG5ldyBtZXNzYWdlIHN0YXJ0cyBmcmVzaAogICAgICAgICAgICByZXR1cm4gYWN0aW9uc193aW4ucGVyZm9ybShhLCBzZWxmLmFwcHMsIHNlbGYuY3VzdG9tLmdldCgpKQoKICAgICAgICBzZWxmLl9sYXN0X3R5cGVkLCBzZWxmLl9sYXN0X2h3bmQsIHNlbGYuX2xhc3RfdGltZSwgc2VsZi5fbGFzdF9wYXN0ZWQgPSAiIiwgMCwgMC4wLCAiIgogICAgICAgIHNlbGYuX2xhc3RfZW5kZWQgPSBUcnVlCiAgICAgICAgc2VsZi50ZXN0X2xpc3RlbmVyID0gTm9uZQogICAgICAgIHNlbGYuZW5naW5lID0gRW5naW5lKHNlbGYuY2ZnLCBwZXJmb3JtLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9uX3N0YXRlPWxhbWJkYSBzLCBtOiBzZWxmLnVpKGxhbWJkYTogc2VsZi5vbl9zdGF0ZShzLCBtKSksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYmVlcD13aW51dGlsLmJlZXAsIGFsbG93ZWQ9c2VsZi5hbGxvd2VkLCBvbl90eXBlZD1zZWxmLm9uX3R5cGVkLCBwYXJzZXI9cGFyc2VyKQogICAgICAgIHNlbGYucHR0ID0gUHVzaFRvVGFsayhzZWxmLmVuZ2luZSkKICAgICAgICBzZWxmLnB0dC5zZXRfa2V5KHNlbGYuY2ZnLnB0dF9rZXkpCiAgICAgICAgc2VsZi53aW5kb3cgPSBNYWluV2luZG93KHNlbGYpCgogICAgICAgIE0gPSBweXN0cmF5Lk1lbnVJdGVtCiAgICAgICAgc2VsZi5pY29uID0gcHlzdHJheS5JY29uKAogICAgICAgICAgICBBUFBfTkFNRSwgbWljX2ljb24oImxvYWRpbmciKSwgQVBQX05BTUUsCiAgICAgICAgICAgIG1lbnU9cHlzdHJheS5NZW51KAogICAgICAgICAgICAgICAgTShmIk9wZW4ge0FQUF9OQU1FfSIsIGxhbWJkYTogc2VsZi51aShzZWxmLndpbmRvdy5zaG93KSwgZGVmYXVsdD1UcnVlKSwKICAgICAgICAgICAgICAgIE0obGFtYmRhIF86IHNlbGYuc3RhdHVzX3RleHQoKSwgTm9uZSwgZW5hYmxlZD1GYWxzZSksCiAgICAgICAgICAgICAgICBweXN0cmF5Lk1lbnUuU0VQQVJBVE9SLAogICAgICAgICAgICAgICAgTSgiUGF1c2UiLCBsYW1iZGE6IHNlbGYudWkobGFtYmRhOiBzZWxmLnNldF9wYXVzZWQobm90IHNlbGYuZW5naW5lLnBhdXNlZCkpLAogICAgICAgICAgICAgICAgICBjaGVja2VkPWxhbWJkYSBfOiBzZWxmLmVuZ2luZS5wYXVzZWQpLAogICAgICAgICAgICAgICAgTSgiVXBkYXRlIGF2YWlsYWJsZSAtIGRvd25sb2FkIiwgbGFtYmRhOiB3ZWJicm93c2VyLm9wZW4oc2VsZi51cGRhdGVfdXJsIG9yIERPV05MT0FEX1BBR0UpLAogICAgICAgICAgICAgICAgICB2aXNpYmxlPWxhbWJkYSBfOiBib29sKHNlbGYudXBkYXRlX3VybCkpLAogICAgICAgICAgICAgICAgcHlzdHJheS5NZW51LlNFUEFSQVRPUiwKICAgICAgICAgICAgICAgIE0oZiJRdWl0IHtBUFBfTkFNRX0iLCBsYW1iZGE6IHNlbGYudWkoc2VsZi5xdWl0KSksCiAgICAgICAgICAgICkpCgogICAgIyAtLS0tLS0tLS0tIHRocmVhZGluZzogdGtpbnRlciBvbmx5IG9uIHRoZSBtYWluIHRocmVhZCAtLS0tLS0tLS0tCiAgICBkZWYgdWkoc2VsZiwgZm4pOgogICAgICAgIHNlbGYuX3VpLnB1dChmbikKCiAgICBkZWYgX3B1bXAoc2VsZik6CiAgICAgICAgd2hpbGUgVHJ1ZToKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgZm4gPSBzZWxmLl91aS5nZXRfbm93YWl0KCkKICAgICAgICAgICAgZXhjZXB0IHF1ZXVlLkVtcHR5OgogICAgICAgICAgICAgICAgYnJlYWsKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgZm4oKQogICAgICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICAgICAgbG9nLmV4Y2VwdGlvbigidWkgdGFzayBmYWlsZWQiKQogICAgICAgIHNlbGYud2luZG93LmFmdGVyKDUwLCBzZWxmLl9wdW1wKQoKICAgICMgLS0tLS0tLS0tLSB0eXBpbmcgbWVtb3J5IChmb3IgImNhcnJ5IG9uIHRoZSBzZW50ZW5jZSIgYW5kICJtYWtlIHRoYXQgbW9yZSBmb3JtYWwiKSAtLS0tLS0tLS0tCiAgICBkZWYgX2ZvcmVncm91bmQoc2VsZik6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBleGUsIF8sIGh3bmQgPSBzZWxmLmFwcHNfbW9kLmZvcmVncm91bmQoKQogICAgICAgICAgICByZXR1cm4gZXhlLnJlcGxhY2UoIi8iLCAiXFwiKS5yc3BsaXQoIlxcIiwgMSlbLTFdLCBpbnQoaHduZCBvciAwKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgIHJldHVybiAiIiwgMAoKICAgIGRlZiBfcmVtZW1iZXIoc2VsZiwgcGFzdGVkOiBzdHIsIGh3bmQ6IGludCwgc2VudDogYm9vbCA9IEZhbHNlKToKICAgICAgICBzZWxmLl9sYXN0X3R5cGVkID0gcGFzdGVkLnJzdHJpcCgpCiAgICAgICAgc2VsZi5fbGFzdF9wYXN0ZWQgPSAiIiBpZiBzZW50IGVsc2UgcGFzdGVkICAgICAjIGFmdGVyIEVudGVyIHRoZSB0ZXh0IGlzIGdvbmUgZnJvbSB0aGUgYm94CiAgICAgICAgc2VsZi5fbGFzdF9od25kLCBzZWxmLl9sYXN0X3RpbWUgPSBod25kLCAoMC4wIGlmIHNlbnQgZWxzZSB0aW1lLnRpbWUoKSkKCiAgICAjIC0tLS0tLS0tLS0gQUkgdm9pY2UgYWN0aW9ucyAtLS0tLS0tLS0tCiAgICBkZWYgc2V0dXBfYWkoc2VsZik6CiAgICAgICAgIiIiQnVpbGQgdGhlIEFJIGhlbHBlciBmcm9tIHNldHRpbmdzLiAiYXV0byIgbG9va3MgZm9yIE9sbGFtYSAvIExNIFN0dWRpbyBydW5uaW5nIG9uIHRoaXMgUEMuIiIiCiAgICAgICAgY2ZnID0gc2VsZi5jZmcKICAgICAgICBpZiBjZmcuYWlfcHJvdmlkZXIgPT0gImF1dG8iOgogICAgICAgICAgICBmb3VuZCA9IHNlbGYuYWkuZGV0ZWN0X2xvY2FsKCkKICAgICAgICAgICAgaWYgZm91bmQ6CiAgICAgICAgICAgICAgICBwLCBiYXNlLCBtb2RlbCA9IGZvdW5kCiAgICAgICAgICAgICAgICBzZWxmLmJyYWluID0gc2VsZi5haS5CcmFpbihwLCBiYXNlLCBtb2RlbCkKICAgICAgICAgICAgICAgIHNlbGYuYWlfc3RhdHVzID0gZiJVc2luZyB7c2VsZi5haS5CWV9JRFtwXVswXS5zcGxpdCgnICgnKVswXX0gb24gdGhpcyBQQyAoe21vZGVsfSkiCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBzZWxmLmJyYWluID0gc2VsZi5haS5CcmFpbigib2ZmIiwgIiIsICIiKQogICAgICAgICAgICAgICAgc2VsZi5haV9zdGF0dXMgPSAiTm8gQUkgZm91bmQgb24gdGhpcyBQQy4gSW5zdGFsbCBPbGxhbWEgKGZyZWUpIG9yIGFkZCBhbiBBUEkga2V5LiIKICAgICAgICBlbHNlOgogICAgICAgICAgICBwLCBiYXNlLCBtb2RlbCA9IHNlbGYuYWkucmVzb2x2ZV9jb25maWcoY2ZnLmFpX3Byb3ZpZGVyLCBjZmcuYWlfYmFzZV91cmwsIGNmZy5haV9tb2RlbCkKICAgICAgICAgICAga2V5ID0gIiIKICAgICAgICAgICAgaWYgY2ZnLmFpX2tleToKICAgICAgICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgICAgICBrZXkgPSBzZWxmLndpbnV0aWwudW5wcm90ZWN0KGNmZy5haV9rZXkpCiAgICAgICAgICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICAgICAgICAgIGxvZy5leGNlcHRpb24oImNvdWxkbid0IHJlYWQgdGhlIHNhdmVkIEFQSSBrZXkiKQogICAgICAgICAgICBzZWxmLmJyYWluID0gc2VsZi5haS5CcmFpbihwLCBiYXNlLCBtb2RlbCwga2V5KQogICAgICAgICAgICBpZiBwID09ICJvZmYiOgogICAgICAgICAgICAgICAgc2VsZi5haV9zdGF0dXMgPSAiQUkgaXMgb2ZmIgogICAgICAgICAgICBlbGlmIG5vdCBzZWxmLmJyYWluLnJlYWR5OgogICAgICAgICAgICAgICAgc2VsZi5haV9zdGF0dXMgPSAiTmVlZHMgYW4gQVBJIGtleSIgaWYgc2VsZi5haS5CWV9JRFtwXVsyXSBhbmQgbm90IGtleSBlbHNlICJQaWNrIGEgbW9kZWwiCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBzZWxmLmFpX3N0YXR1cyA9IGYiUmVhZHk6IHttb2RlbH0iCiAgICAgICAgbG9nLmluZm8oIkFJOiAlcyIsIHNlbGYuYWlfc3RhdHVzKQogICAgICAgIHNlbGYudWkobGFtYmRhOiBzZWxmLndpbmRvdy5haV9jaGFuZ2VkKCkpCgogICAgZGVmIHNldF9haV9rZXkoc2VsZiwgcGxhaW46IHN0cik6CiAgICAgICAgIiIiS2V5cyBhcmUgZW5jcnlwdGVkIHdpdGggV2luZG93cyAoRFBBUEkpIGJlZm9yZSB0aGV5IHRvdWNoIHRoZSBzZXR0aW5ncyBmaWxlLiIiIgogICAgICAgIHRyeToKICAgICAgICAgICAgZW5jID0gc2VsZi53aW51dGlsLnByb3RlY3QocGxhaW4uc3RyaXAoKSkgaWYgcGxhaW4uc3RyaXAoKSBlbHNlICIiCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgbG9nLmV4Y2VwdGlvbigiY291bGRuJ3QgZW5jcnlwdCB0aGUgQVBJIGtleSIpCiAgICAgICAgICAgIHJldHVybiBGYWxzZQogICAgICAgIHNlbGYudXBkYXRlX2NmZyhhaV9rZXk9ZW5jKQogICAgICAgIHJldHVybiBUcnVlCgogICAgZGVmIHRlc3RfYWkoc2VsZiwgZG9uZSk6CiAgICAgICAgIiIiUm91bmQtdHJpcCBhIHRpbnkgcHJvbXB0OyBkb25lKG9rLCBtZXNzYWdlKSBpcyBjYWxsZWQgb24gdGhlIFVJIHRocmVhZC4iIiIKICAgICAgICBkZWYgd29yaygpOgogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBvdXQgPSBzZWxmLmJyYWluLmNvbXBsZXRlKCJJbnN0cnVjdGlvbjogcmVwbHkgd2l0aCB0aGUgc2luZ2xlIHdvcmQ6IHJlYWR5IiwgdGltZW91dD0zMCkKICAgICAgICAgICAgICAgIG9rLCBtc2cgPSBUcnVlLCBmIldvcmtzISBUaGUgQUkgc2FpZDoge291dFs6NDBdfSIKICAgICAgICAgICAgZXhjZXB0IHNlbGYuYWkuQUlFcnJvciBhcyBlOgogICAgICAgICAgICAgICAgb2ssIG1zZyA9IEZhbHNlLCBzdHIoZSkKICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICAgICAgb2ssIG1zZyA9IEZhbHNlLCBmIlNvbWV0aGluZyB3ZW50IHdyb25nOiB7ZX0iCiAgICAgICAgICAgIHNlbGYudWkobGFtYmRhOiBkb25lKG9rLCBtc2cpKQogICAgICAgIHRocmVhZGluZy5UaHJlYWQodGFyZ2V0PXdvcmssIGRhZW1vbj1UcnVlLCBuYW1lPSJhaS10ZXN0Iikuc3RhcnQoKQoKICAgIGRlZiBydW5fYWkoc2VsZiwgYSk6CiAgICAgICAgIiIiUnVucyBvbiB0aGUgZW5naW5lIHRocmVhZDogZ3JhYiB0aGUgdGV4dCwgYXNrIHRoZSBBSSwgcHV0IHRoZSBhbnN3ZXIgd2hlcmUgdGhlIGN1cnNvciBpcy4iIiIKICAgICAgICBvcCA9ICJlZGl0IiBpZiBhLmtpbmQgPT0gImFpX2VkaXQiIGVsc2UgIndyaXRlIgogICAgICAgIGlmIG5vdCBzZWxmLmJyYWluLnJlYWR5OgogICAgICAgICAgICByZXR1cm4gIkFJIGlzbid0IHNldCB1cCAtIG9wZW4gU2V0dGluZ3MgPiBBSSAoT2xsYW1hIGlzIGZyZWUgYW5kIHByaXZhdGUpLiIKICAgICAgICBleGUsIGh3bmQgPSBzZWxmLl9mb3JlZ3JvdW5kKCkKICAgICAgICAjIGluIGEgdGVybWluYWwgQ3RybCtDIHdvdWxkIHN0b3AgdGhlIHJ1bm5pbmcgcHJvZ3JhbSwgc28gbmV2ZXIgY29weSB0aGVyZQogICAgICAgIHNlbGVjdGVkID0gIiIgaWYgc2VsZi5zdHlsZV9mb3IoZXhlKSA9PSAidGVybWluYWwiIGVsc2Ugc2VsZi5hY3Rpb25zLmNvcHlfc2VsZWN0aW9uKCkKICAgICAgICBpZiBzZWxlY3RlZC5lbmRzd2l0aCgiXG4iKSBhbmQgc2VsZWN0ZWQuY291bnQoIlxuIikgPT0gMToKICAgICAgICAgICAgc2VsZWN0ZWQgPSAiIiAgICMgY29kZSBlZGl0b3JzIGNvcHkgdGhlIHdob2xlIGxpbmUgd2hlbiBub3RoaW5nIGlzIHNlbGVjdGVkCiAgICAgICAgc2VsZWN0ZWQgPSBzZWxlY3RlZC5zdHJpcCgpCiAgICAgICAgZnJlc2ggPSBib29sKHNlbGYuX2xhc3RfcGFzdGVkKSBhbmQgaHduZCA9PSBzZWxmLl9sYXN0X2h3bmQgYW5kIHRpbWUudGltZSgpIC0gc2VsZi5fbGFzdF90aW1lIDwgRURJVF9MQVNUX1NFQ1MKICAgICAgICBzb3VyY2UsIGhvdyA9IHNlbGYuYWkuY2hvb3NlX3NvdXJjZShvcCwgc2VsZWN0ZWQsIHNlbGYuX2xhc3RfcGFzdGVkLnJzdHJpcCgpLCBmcmVzaCkKICAgICAgICBpZiBob3cgbm90IGluICgicmVwbGFjZV9zZWxlY3Rpb24iLCAicmVwbGFjZV9sYXN0IiwgImluc2VydCIsICJpbnNlcnRfYWZ0ZXJfc2VsZWN0aW9uIik6CiAgICAgICAgICAgIHJldHVybiBob3cKICAgICAgICB0cnk6CiAgICAgICAgICAgIG91dCA9IHNlbGYuYnJhaW4uY29tcGxldGUoc2VsZi5haS5idWlsZF9wcm9tcHQoc2VsZi5haS5JbnRlbnQob3AsIGEudGV4dCksIHNvdXJjZSkpCiAgICAgICAgZXhjZXB0IHNlbGYuYWkuQUlFcnJvciBhcyBlOgogICAgICAgICAgICByZXR1cm4gc3RyKGUpCiAgICAgICAgaWYgbm90IG91dDoKICAgICAgICAgICAgcmV0dXJuICJUaGUgQUkgZGlkbid0IHNlbmQgYW55dGhpbmcgYmFjay4iCiAgICAgICAgaWYgc2VsZi5fZm9yZWdyb3VuZCgpWzFdICE9IGh3bmQ6CiAgICAgICAgICAgICMgeW91IG1vdmVkIG9uIHdoaWxlIHRoZSBBSSB3YXMgdGhpbmtpbmcgLSBkb24ndCB0eXBlIGludG8gdGhlIHdyb25nIHdpbmRvdwogICAgICAgICAgICBzZWxmLnVpKGxhbWJkYTogc2VsZi53aW5kb3cuY2xpcGJvYXJkX3NldChvdXQpKQogICAgICAgICAgICBzZWxmLnJlY29yZChvdXQpCiAgICAgICAgICAgIHJldHVybiAiVGhlIEFJIGFuc3dlciBpcyBvbiB5b3VyIGNsaXBib2FyZCAoeW91IHN3aXRjaGVkIHdpbmRvd3MpIC0gcHJlc3MgQ3RybCtWLiIKICAgICAgICBpZiBob3cgPT0gInJlcGxhY2VfbGFzdCI6CiAgICAgICAgICAgIHNlbGYuYWN0aW9ucy5zZWxlY3RfYmFjayhsZW4oc2VsZi5fbGFzdF9wYXN0ZWQpKQogICAgICAgIGVsaWYgaG93ID09ICJpbnNlcnRfYWZ0ZXJfc2VsZWN0aW9uIjoKICAgICAgICAgICAgc2VsZi5hY3Rpb25zLmNvbGxhcHNlX3NlbGVjdGlvbigpCiAgICAgICAgc2VsZi5hY3Rpb25zLnBhc3RlKG91dCkKICAgICAgICBzZWxmLl9yZW1lbWJlcihvdXQsIGh3bmQpCiAgICAgICAgc2VsZi5yZWNvcmQob3V0KQogICAgICAgIHJldHVybiBmIkFJOiB7b3V0Wzo2MF19IgoKICAgICMgLS0tLS0tLS0tLSBlbmdpbmUgaG9va3MgLS0tLS0tLS0tLQogICAgZGVmIGFsbG93ZWQoc2VsZiwgYWN0aW9uKToKICAgICAgICAiIiJLZWVwcyBTYXlzbyBxdWlldCBpbiBhcHBzIHRoZSB1c2VyIHR1cm5lZCBvZmYuIiIiCiAgICAgICAgaWYgYWN0aW9uLmtpbmQgaW4gKCJ1aSIsICJzdG9wIiwgImRpY3RhdGVfb24iLCAiZGljdGF0ZV9vZmYiLCAibm90aGluZyIpOgogICAgICAgICAgICByZXR1cm4gTm9uZQogICAgICAgIGlmIGFjdGlvbi5raW5kICE9ICJzd2l0Y2giOgogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBpZiBzZWxmLmFjdGlvbnMuZm9yZWdyb3VuZF9pc19hZG1pbigpOgogICAgICAgICAgICAgICAgICAgIHJldHVybiAiQ2FuJ3QgdHlwZSBpbnRvIGFwcHMgcnVubmluZyBhcyBhZG1pbmlzdHJhdG9yIC0gV2luZG93cyBibG9ja3MgaXQiCiAgICAgICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgICAgICBwYXNzCiAgICAgICAgZGlzYWJsZWQgPSBzZXQoc2VsZi5jZmcuZGlzYWJsZWRfYXBwcykKICAgICAgICBpZiBub3QgZGlzYWJsZWQ6CiAgICAgICAgICAgIHJldHVybiBOb25lCiAgICAgICAgaWYgYWN0aW9uLmtpbmQgPT0gInN3aXRjaCI6CiAgICAgICAgICAgIGFwcCA9IHNlbGYuYXBwc19tb2QuZmluZF9hcHAoc2VsZi5hcHBzLCBhY3Rpb24udGV4dCkKICAgICAgICAgICAgcmV0dXJuIGYiU2F5c28gaXMgdHVybmVkIG9mZiBmb3Ige2FwcC5uYW1lfSIgaWYgYXBwIGFuZCBhcHAuaWQgaW4gZGlzYWJsZWQgZWxzZSBOb25lCiAgICAgICAgdHJ5OgogICAgICAgICAgICBleGUsIHRpdGxlLCBfID0gc2VsZi5hcHBzX21vZC5mb3JlZ3JvdW5kKCkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICByZXR1cm4gTm9uZQogICAgICAgIGFwcCA9IHNlbGYuYXBwc19tb2QubWF0Y2hfZm9yZWdyb3VuZChzZWxmLmFwcHMsIGV4ZSwgdGl0bGUpCiAgICAgICAgaWYgYXBwIGFuZCBhcHAuaWQgaW4gZGlzYWJsZWQ6CiAgICAgICAgICAgIHJldHVybiBmIlNheXNvIGlzIHR1cm5lZCBvZmYgaW4ge2FwcC5uYW1lfSAtIHR1cm4gaXQgb24gaW4gdGhlIEFwcHMgdGFiIgogICAgICAgIHJldHVybiBOb25lCgogICAgIyAtLS0tLS0tLS0tIGhpc3RvcnkgKGtlcHQgb25seSBvbiB0aGlzIFBDKSAtLS0tLS0tLS0tCiAgICBAc3RhdGljbWV0aG9kCiAgICBkZWYgX2hpc3RvcnlfcGF0aCgpOgogICAgICAgIHJldHVybiBkYXRhX2RpcigpIC8gImhpc3RvcnkuanNvbiIKCiAgICBkZWYgX2xvYWRfaGlzdG9yeShzZWxmKToKICAgICAgICB0cnk6CiAgICAgICAgICAgIHJldHVybiBqc29uLmxvYWRzKHNlbGYuX2hpc3RvcnlfcGF0aCgpLnJlYWRfdGV4dChlbmNvZGluZz0idXRmLTgiKSlbLUhJU1RPUllfTUFYOl0KICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICByZXR1cm4gW10KCiAgICBkZWYgY2xlYXJfaGlzdG9yeShzZWxmKToKICAgICAgICBzZWxmLmhpc3RvcnkgPSBbXQogICAgICAgIHNlbGYuX2hpc3RvcnlfcGF0aCgpLndyaXRlX3RleHQoIltdIiwgZW5jb2Rpbmc9InV0Zi04IikKICAgICAgICBzZWxmLndpbmRvdy5yZWZyZXNoX2hvbWUoKQoKICAgICMgLS0tLS0tLS0tLSAidHJ5IGl0IiBpbiBzZXR1cCAvIHNldHRpbmdzIC0tLS0tLS0tLS0KICAgIGRlZiBzdGFydF90ZXN0KHNlbGYsIGNhbGxiYWNrKToKICAgICAgICAiIiJUaGUgbmV4dCB0aGluZyB0aGUgdXNlciBzYXlzIHRvIFNheXNvIGdvZXMgdG8gY2FsbGJhY2soYWN0aW9uKSAob24gdGhlIFVJIHRocmVhZCksIG5vdCBpbnRvIGFuIGFwcC4iIiIKICAgICAgICBzZWxmLnRlc3RfbGlzdGVuZXIgPSBjYWxsYmFjawoKICAgIGRlZiBzdG9wX3Rlc3Qoc2VsZik6CiAgICAgICAgc2VsZi50ZXN0X2xpc3RlbmVyID0gTm9uZQoKICAgIGRlZiBvbl90eXBlZChzZWxmLCBhY3Rpb24pOgogICAgICAgIGlmIHNlbGYudGVzdF9saXN0ZW5lciBpcyBub3QgTm9uZToKICAgICAgICAgICAgcmV0dXJuCiAgICAgICAgc2VsZi5yZWNvcmQoc2VsZi5fbGFzdF90eXBlZCBpZiBhY3Rpb24ua2luZCBpbiAoInR5cGUiLCAidHlwZV9zZW5kIikgZWxzZSBhY3Rpb24udGV4dCkKCiAgICBkZWYgcmVjb3JkKHNlbGYsIHRleHQpOgogICAgICAgIG4gPSBsZW4odGV4dC5zcGxpdCgpKQoKICAgICAgICBkZWYgc2F2ZSgpOgogICAgICAgICAgICBzZWxmLmNmZy53b3Jkc190eXBlZCArPSBuCiAgICAgICAgICAgIHNlbGYuY2ZnLnNhdmUoKQogICAgICAgICAgICBzZWxmLmhpc3RvcnkgPSAoc2VsZi5oaXN0b3J5ICsgW3sidCI6IHRpbWUuc3RyZnRpbWUoIiVIOiVNIiksICJ0ZXh0IjogdGV4dH1dKVstSElTVE9SWV9NQVg6XQogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBzZWxmLl9oaXN0b3J5X3BhdGgoKS53cml0ZV90ZXh0KGpzb24uZHVtcHMoc2VsZi5oaXN0b3J5KSwgZW5jb2Rpbmc9InV0Zi04IikKICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICAgIGxvZy5leGNlcHRpb24oImhpc3Rvcnkgc2F2ZSBmYWlsZWQiKQogICAgICAgICAgICBzZWxmLndpbmRvdy5yZWZyZXNoX2hvbWUoKQogICAgICAgIHNlbGYudWkoc2F2ZSkKCiAgICBkZWYgc3RhdHVzX3RleHQoc2VsZik6CiAgICAgICAgcmV0dXJuIHNlbGYuU1RBVFVTLmdldChzZWxmLnN0YXRlLCAoc2VsZi5zdGF0ZSwpKVswXS5mb3JtYXQod2FrZT1zZWxmLmNmZy53YWtlX3dvcmQpCgogICAgZGVmIG9uX3N0YXRlKHNlbGYsIHN0YXRlLCBtc2cpOgogICAgICAgIHNlbGYuc3RhdGUgPSBzdGF0ZQogICAgICAgIGlmIG1zZzoKICAgICAgICAgICAgc2VsZi5sYXN0X21zZyA9IG1zZwogICAgICAgIHNlbGYuaWNvbi5pY29uID0gc2VsZi5taWNfaWNvbihzdGF0ZSkKICAgICAgICBzZWxmLmljb24udGl0bGUgPSBmIntBUFBfTkFNRX0gLSB7c2VsZi5zdGF0dXNfdGV4dCgpfSIgKyAoZiJcbnttc2dbOjYwXX0iIGlmIG1zZyBlbHNlICIiKQogICAgICAgIHNlbGYuaWNvbi51cGRhdGVfbWVudSgpCiAgICAgICAgc2VsZi53aW5kb3cudXBkYXRlX3N0YXRlKHN0YXRlLCBtc2cpCiAgICAgICAgaWYgc2VsZi5jZmcuc2hvd19idWJibGU6CiAgICAgICAgICAgIHNlbGYud2luZG93LmJ1YmJsZS5zaG93KHN0YXRlLCBtc2csIHNlbGYuc3RhdHVzX3RleHQoKSkKICAgICAgICBpZiBzdGF0ZSA9PSAiZXJyb3IiIGFuZCBtc2cgYW5kIG1zZyAhPSBnZXRhdHRyKHNlbGYsICJfbGFzdF9lcnJvciIsICIiKToKICAgICAgICAgICAgc2VsZi5ub3RpZnkobXNnKSAgICMgb25jZSBwZXIgcHJvYmxlbSwgbm90IG9uIGV2ZXJ5IHJldHJ5CiAgICAgICAgc2VsZi5fbGFzdF9lcnJvciA9IG1zZyBpZiBzdGF0ZSA9PSAiZXJyb3IiIGVsc2UgIiIKCiAgICBkZWYgbm90aWZ5KHNlbGYsIG1zZyk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBzZWxmLmljb24ubm90aWZ5KG1zZywgQVBQX05BTUUpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcGFzcwoKICAgICMgLS0tLS0tLS0tLSB1c2VkIGJ5IHRoZSB3aW5kb3cgLS0tLS0tLS0tLQogICAgZGVmIHNldF9wYXVzZWQoc2VsZiwgcGF1c2VkOiBib29sKToKICAgICAgICBzZWxmLmVuZ2luZS5zZXRfcGF1c2VkKHBhdXNlZCkKICAgICAgICBzZWxmLmljb24udXBkYXRlX21lbnUoKQoKICAgIGRlZiBfc2V0X2F1dG9zdGFydChzZWxmLCBvbjogYm9vbCk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBzZWxmLndpbnV0aWwuc2V0X2F1dG9zdGFydChvbikKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICBsb2cuZXhjZXB0aW9uKCJhdXRvc3RhcnQgY2hhbmdlIGZhaWxlZCIpCgogICAgZGVmIHVwZGF0ZV9jZmcoc2VsZiwgKipjaGFuZ2VzKToKICAgICAgICBzZWxmLmNmZyA9IHJlcGxhY2Uoc2VsZi5jZmcsICoqY2hhbmdlcykKICAgICAgICBzZWxmLmNmZy5zYXZlKCkKICAgICAgICBpZiAibGF1bmNoX2F0X3N0YXJ0dXAiIGluIGNoYW5nZXM6CiAgICAgICAgICAgIHNlbGYuX3NldF9hdXRvc3RhcnQoc2VsZi5jZmcubGF1bmNoX2F0X3N0YXJ0dXApCiAgICAgICAgaWYgInB0dF9rZXkiIGluIGNoYW5nZXM6CiAgICAgICAgICAgIHNlbGYucHR0LnNldF9rZXkoc2VsZi5jZmcucHR0X2tleSkKICAgICAgICBpZiBBSV9LRVlTICYgY2hhbmdlcy5rZXlzKCk6CiAgICAgICAgICAgIHRocmVhZGluZy5UaHJlYWQodGFyZ2V0PXNlbGYuc2V0dXBfYWksIGRhZW1vbj1UcnVlLCBuYW1lPSJhaS1zZXR1cCIpLnN0YXJ0KCkKICAgICAgICBpZiBFTkdJTkVfS0VZUyAmIGNoYW5nZXMua2V5cygpOgogICAgICAgICAgICBzZWxmLmVuZ2luZS5hcHBseV9jb25maWcoc2VsZi5jZmcpCiAgICAgICAgZWxzZToKICAgICAgICAgICAgc2VsZi5lbmdpbmUuY2ZnID0gc2VsZi5jZmcKICAgICAgICBsb2cuaW5mbygic2V0dGluZ3MgY2hhbmdlZDogJXMiLCBjaGFuZ2VzKQoKICAgIGRlZiBzZXRfYXBwX2VuYWJsZWQoc2VsZiwgYXBwX2lkOiBzdHIsIG9uOiBib29sKToKICAgICAgICBkaXNhYmxlZCA9IFthIGZvciBhIGluIHNlbGYuY2ZnLmRpc2FibGVkX2FwcHMgaWYgYSAhPSBhcHBfaWRdCiAgICAgICAgaWYgbm90IG9uOgogICAgICAgICAgICBkaXNhYmxlZC5hcHBlbmQoYXBwX2lkKQogICAgICAgIHNlbGYudXBkYXRlX2NmZyhkaXNhYmxlZF9hcHBzPWRpc2FibGVkKQoKICAgIGRlZiBzZXRfYWxsX2FwcHNfZW5hYmxlZChzZWxmLCBvbjogYm9vbCk6CiAgICAgICAgc2VsZi51cGRhdGVfY2ZnKGRpc2FibGVkX2FwcHM9W10gaWYgb24gZWxzZSBbYS5pZCBmb3IgYSBpbiBzZWxmLmFwcHNdKQoKICAgIGRlZiByZXNjYW5fYXBwcyhzZWxmKToKICAgICAgICBpZiBzZWxmLnNjYW5uaW5nOgogICAgICAgICAgICByZXR1cm4KICAgICAgICBzZWxmLnNjYW5uaW5nID0gVHJ1ZQogICAgICAgIHNlbGYud2luZG93LmFwcHNfY2hhbmdlZCgpCgogICAgICAgIGRlZiB3b3JrKCk6CiAgICAgICAgICAgIGZvdW5kID0gc2VsZi5hcHBzX21vZC5zY2FuKCkKCiAgICAgICAgICAgIGRlZiBkb25lKCk6CiAgICAgICAgICAgICAgICBzZWxmLnNjYW5uaW5nID0gRmFsc2UKICAgICAgICAgICAgICAgIGlmIGZvdW5kOgogICAgICAgICAgICAgICAgICAgIHNlbGYuYXBwcyA9IGZvdW5kCiAgICAgICAgICAgICAgICBzZWxmLndpbmRvdy5hcHBzX2NoYW5nZWQoKQogICAgICAgICAgICBzZWxmLnVpKGRvbmUpCiAgICAgICAgdGhyZWFkaW5nLlRocmVhZCh0YXJnZXQ9d29yaywgZGFlbW9uPVRydWUsIG5hbWU9ImFwcC1zY2FuIikuc3RhcnQoKQoKICAgIGRlZiBjaGVja19mb3JfdXBkYXRlKHNlbGYpOgogICAgICAgIHRyeToKICAgICAgICAgICAgcmVxID0gdXJsbGliLnJlcXVlc3QuUmVxdWVzdChmImh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3Mve1JFUE99L3JlbGVhc2VzL2xhdGVzdCIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaGVhZGVycz17IkFjY2VwdCI6ICJhcHBsaWNhdGlvbi92bmQuZ2l0aHViK2pzb24ifSkKICAgICAgICAgICAgd2l0aCB1cmxsaWIucmVxdWVzdC51cmxvcGVuKHJlcSwgdGltZW91dD0xMCkgYXMgcjoKICAgICAgICAgICAgICAgIGxhdGVzdCA9IGpzb24ubG9hZHMoci5yZWFkKCkpLmdldCgidGFnX25hbWUiLCAiIikKICAgICAgICAgICAgaWYgbGF0ZXN0IGFuZCB2ZXJzaW9uX3R1cGxlKGxhdGVzdCkgPiB2ZXJzaW9uX3R1cGxlKF9fdmVyc2lvbl9fKToKICAgICAgICAgICAgICAgIHNlbGYudXBkYXRlX3VybCA9IERPV05MT0FEX1BBR0UKICAgICAgICAgICAgICAgIHNlbGYudWkobGFtYmRhOiAoc2VsZi5pY29uLnVwZGF0ZV9tZW51KCksIHNlbGYubm90aWZ5KGYiU2F5c28ge2xhdGVzdH0gaXMgYXZhaWxhYmxlLiIpKSkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIGxvZy5pbmZvKCJ1cGRhdGUgY2hlY2sgc2tpcHBlZDogJXMiLCBlKQoKICAgIGRlZiBxdWl0KHNlbGYpOgogICAgICAgIHNlbGYuZW5naW5lLnN0b3AoKQogICAgICAgIHRyeToKICAgICAgICAgICAgc2VsZi5pY29uLnZpc2libGUgPSBGYWxzZSAgICMgcmVtb3ZlcyB0aGUgdHJheSBpY29uIHN0cmFpZ2h0IGF3YXkgKG5vIGdob3N0IGljb24pCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcGFzcwogICAgICAgIHRyeToKICAgICAgICAgICAgc2VsZi5pY29uLnN0b3AoKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgIHBhc3MKICAgICAgICBzZWxmLndpbmRvdy5xdWl0KCkKCiAgICBkZWYgcnVuKHNlbGYpOgogICAgICAgIHRocmVhZGluZy5UaHJlYWQodGFyZ2V0PXNlbGYuaWNvbi5ydW4sIGRhZW1vbj1UcnVlLCBuYW1lPSJ0cmF5Iikuc3RhcnQoKQogICAgICAgIHNlbGYuZW5naW5lLnN0YXJ0KCkKICAgICAgICBzZWxmLnB0dC5zdGFydCgpCiAgICAgICAgc2VsZi5yZXNjYW5fYXBwcygpCiAgICAgICAgdGhyZWFkaW5nLlRocmVhZCh0YXJnZXQ9c2VsZi5jaGVja19mb3JfdXBkYXRlLCBkYWVtb249VHJ1ZSwgbmFtZT0idXBkYXRlIikuc3RhcnQoKQogICAgICAgIHRocmVhZGluZy5UaHJlYWQodGFyZ2V0PXNlbGYuc2V0dXBfYWksIGRhZW1vbj1UcnVlLCBuYW1lPSJhaS1zZXR1cCIpLnN0YXJ0KCkKICAgICAgICBpZiBzZWxmLmNmZy5maXJzdF9ydW5fZG9uZToKICAgICAgICAgICAgc2VsZi53aW5kb3cud2l0aGRyYXcoKSAgICMgYWxyZWFkeSBzZXQgdXA6IGxpdmUgcXVpZXRseSBpbiB0aGUgdHJheQogICAgICAgIGVsc2U6CiAgICAgICAgICAgIHNlbGYud2luZG93LnNob3coKQogICAgICAgIHNlbGYud2luZG93LmFmdGVyKDUwLCBzZWxmLl9wdW1wKQogICAgICAgIHNlbGYud2luZG93LmFmdGVyKDIwMCwgc2VsZi53aW5kb3cuYnViYmxlLmJ1aWxkKSAgICMgbWFkZSB1cCBmcm9udCBzbyBpdCBuZXZlciBncmFicyBmb2N1cyBsYXRlcgogICAgICAgIHNlbGYud2luZG93Lm1haW5sb29wKCkKCgpkZWYgbWFpbigpOgogICAgc2V0dXBfbG9nZ2luZygpCiAgICBsb2cuaW5mbygiJXMgJXMgc3RhcnRpbmciLCBBUFBfTkFNRSwgX192ZXJzaW9uX18pCiAgICBmcm9tIHNheXNvIGltcG9ydCB3aW51dGlsCiAgICBpZiB3aW51dGlsLmFscmVhZHlfcnVubmluZygpOgogICAgICAgIHdpbnV0aWwubWVzc2FnZShBUFBfTkFNRSwgZiJ7QVBQX05BTUV9IGlzIGFscmVhZHkgcnVubmluZyAtIGNsaWNrIHRoZSBtaWNyb3Bob25lIGljb24gYnkgdGhlIGNsb2NrLiIpCiAgICAgICAgcmV0dXJuCiAgICBBcHAoKS5ydW4oKQo=
+"""Entry point: tray icon + engine + window, wired together."""
+import json
+import logging
+import re
+import time
+import queue
+import sys
+import threading
+import urllib.request
+import webbrowser
+from dataclasses import replace
+from logging.handlers import RotatingFileHandler
+
+from sayso import APP_NAME, __version__
+from sayso.config import Config, data_dir
+
+log = logging.getLogger("sayso")
+
+REPO = "gearwithai/sayso"
+DOWNLOAD_PAGE = "https://gearwithai.github.io/sayso/"
+ENGINE_KEYS = {"hands_free", "wake_word", "stt_model", "mic_device", "silence_level", "silence_secs", "send_word",
+               "beeps", "max_secs", "language", "use_cuda", "mic_name"}
+AI_KEYS = {"ai_provider", "ai_model", "ai_base_url", "ai_key"}
+CONTINUE_SECS = 45        # carry a sentence on if you speak again in the same window within this time
+EDIT_LAST_SECS = 300      # "make that more formal" works on what Sayso last typed for this long
+HISTORY_MAX = 50
+
+
+def setup_logging():
+    h = RotatingFileHandler(data_dir() / "sayso.log", maxBytes=1_000_000, backupCount=2, encoding="utf-8")
+    h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    logging.basicConfig(level=logging.INFO, handlers=[h])
+    if sys.stderr:  # running from a terminal
+        logging.getLogger().addHandler(logging.StreamHandler())
+    sys.excepthook = lambda *a: log.critical("crash", exc_info=a)
+
+
+def version_tuple(v: str):
+    return tuple(int(x) for x in v.lstrip("v").split(".") if x.isdigit())
+
+
+class App:
+    def __init__(self):
+        import pystray
+        from sayso import actions_win, apps, winutil
+        from sayso.engine import Engine
+        from sayso.hotkey import PushToTalk
+        from sayso.icons import mic_icon
+        from sayso.ui import MainWindow, STATUS
+        from sayso.commands import Action, parse
+        from sayso.custom import CustomCommands
+        from sayso.text import clean, continue_sentence, style_for
+        self.style_for = style_for
+        from sayso import ai
+
+        self.pystray, self.winutil, self.mic_icon, self.apps_mod, self.STATUS = pystray, winutil, mic_icon, apps, STATUS
+        self.ai, self.actions = ai, actions_win
+        self.brain = ai.Brain("off", "", "")
+        self.ai_status = "AI is off"
+        self.cfg = Config.load()
+        if not self.cfg.first_run_done:
+            self._set_autostart(True)  # on by default, so there's nothing to set up again
+        else:
+            self.cfg.launch_at_startup = winutil.autostart_enabled()
+        self.apps = apps.load_cached()
+        self.scanning = False
+        self.state, self.last_msg, self.update_url = "loading", "", None
+        self._ui: "queue.Queue" = queue.Queue()
+        self.custom = CustomCommands()
+        self.history = self._load_history()
+
+        def parser(text, allow_commands):
+            return parse(text, self.cfg.send_word, allow_commands=allow_commands,
+                         snippets=self.cfg.snippets, custom=list(self.custom.get()), ai_ready=self.brain.ready)
+
+        def perform(a):
+            listener = self.test_listener
+            if listener is not None:   # "try your wake word": show what was heard instead of typing it
+                self.ui(lambda: listener(a))
+                return "Heard you!"
+            if a.kind in ("type", "type_send"):
+                exe, hwnd = self._foreground()
+                style = style_for(exe) if self.cfg.smart_format else "normal"
+                text = clean(a.text, self.cfg.replacements, self.cfg.cleanup, style)
+                # did the sentence really end? (chat style hides the final full stop)
+                ended = bool(re.search(r"[.?!:]\s*$", clean(a.text, None, self.cfg.cleanup)))
+                if (self.cfg.smart_continue and style != "terminal" and hwnd == self._last_hwnd
+                        and time.time() - self._last_time < CONTINUE_SECS and not self._last_ended):
+                    text = continue_sentence(text, self._last_typed)
+                a = Action(a.kind, text)
+                msg = actions_win.perform(a, self.apps, self.custom.get())
+                self._remember(text + (" " if a.kind == "type" else ""), hwnd, sent=a.kind == "type_send")
+                self._last_ended = ended
+                return msg
+            if a.kind in ("ai_edit", "ai_write"):
+                return self.run_ai(a)
+            if a.kind == "ui":
+                self.ui(lambda: self.window.show_tab(a.text))
+                return f"Opened {a.text}"
+            if a.kind in ("send", "newline"):
+                self._last_time = 0     # a new message starts fresh
+            return actions_win.perform(a, self.apps, self.custom.get())
+
+        self._last_typed, self._last_hwnd, self._last_time, self._last_pasted = "", 0, 0.0, ""
+        self._last_ended = True
+        self.test_listener = None
+        self.engine = Engine(self.cfg, perform,
+                             on_state=lambda s, m: self.ui(lambda: self.on_state(s, m)),
+                             beep=winutil.beep, allowed=self.allowed, on_typed=self.on_typed, parser=parser)
+        self.ptt = PushToTalk(self.engine)
+        self.ptt.set_key(self.cfg.ptt_key)
+        self.window = MainWindow(self)
+
+        M = pystray.MenuItem
+        self.icon = pystray.Icon(
+            APP_NAME, mic_icon("loading"), APP_NAME,
+            menu=pystray.Menu(
+                M(f"Open {APP_NAME}", lambda: self.ui(self.window.show), default=True),
+                M(lambda _: self.status_text(), None, enabled=False),
+                pystray.Menu.SEPARATOR,
+                M("Pause", lambda: self.ui(lambda: self.set_paused(not self.engine.paused)),
+                  checked=lambda _: self.engine.paused),
+                M("Update available - download", lambda: webbrowser.open(self.update_url or DOWNLOAD_PAGE),
+                  visible=lambda _: bool(self.update_url)),
+                pystray.Menu.SEPARATOR,
+                M(f"Quit {APP_NAME}", lambda: self.ui(self.quit)),
+            ))
+
+    # ---------- threading: tkinter only on the main thread ----------
+    def ui(self, fn):
+        self._ui.put(fn)
+
+    def _pump(self):
+        while True:
+            try:
+                fn = self._ui.get_nowait()
+            except queue.Empty:
+                break
+            try:
+                fn()
+            except Exception:
+                log.exception("ui task failed")
+        self.window.after(50, self._pump)
+
+    # ---------- typing memory (for "carry on the sentence" and "make that more formal") ----------
+    def _foreground(self):
+        try:
+            exe, _, hwnd = self.apps_mod.foreground()
+            return exe.replace("/", "\\").rsplit("\\", 1)[-1], int(hwnd or 0)
+        except Exception:
+            return "", 0
+
+    def _remember(self, pasted: str, hwnd: int, sent: bool = False):
+        self._last_typed = pasted.rstrip()
+        self._last_pasted = "" if sent else pasted     # after Enter the text is gone from the box
+        self._last_hwnd, self._last_time = hwnd, (0.0 if sent else time.time())
+
+    # ---------- AI voice actions ----------
+    def setup_ai(self):
+        """Build the AI helper from settings. "auto" looks for Ollama / LM Studio running on this PC."""
+        cfg = self.cfg
+        if cfg.ai_provider == "auto":
+            found = self.ai.detect_local()
+            if found:
+                p, base, model = found
+                self.brain = self.ai.Brain(p, base, model)
+                self.ai_status = f"Using {self.ai.BY_ID[p][0].split(' (')[0]} on this PC ({model})"
+            else:
+                self.brain = self.ai.Brain("off", "", "")
+                self.ai_status = "No AI found on this PC. Install Ollama (free) or add an API key."
+        else:
+            p, base, model = self.ai.resolve_config(cfg.ai_provider, cfg.ai_base_url, cfg.ai_model)
+            key = ""
+            if cfg.ai_key:
+                try:
+                    key = self.winutil.unprotect(cfg.ai_key)
+                except Exception:
+                    log.exception("couldn't read the saved API key")
+            self.brain = self.ai.Brain(p, base, model, key)
+            if p == "off":
+                self.ai_status = "AI is off"
+            elif not self.brain.ready:
+                self.ai_status = "Needs an API key" if self.ai.BY_ID[p][2] and not key else "Pick a model"
+            else:
+                self.ai_status = f"Ready: {model}"
+        log.info("AI: %s", self.ai_status)
+        self.ui(lambda: self.window.ai_changed())
+
+    def set_ai_key(self, plain: str):
+        """Keys are encrypted with Windows (DPAPI) before they touch the settings file."""
+        try:
+            enc = self.winutil.protect(plain.strip()) if plain.strip() else ""
+        except Exception:
+            log.exception("couldn't encrypt the API key")
+            return False
+        self.update_cfg(ai_key=enc)
+        return True
+
+    def test_ai(self, done):
+        """Round-trip a tiny prompt; done(ok, message) is called on the UI thread."""
+        def work():
+            try:
+                out = self.brain.complete("Instruction: reply with the single word: ready", timeout=30)
+                ok, msg = True, f"Works! The AI said: {out[:40]}"
+            except self.ai.AIError as e:
+                ok, msg = False, str(e)
+            except Exception as e:
+                ok, msg = False, f"Something went wrong: {e}"
+            self.ui(lambda: done(ok, msg))
+        threading.Thread(target=work, daemon=True, name="ai-test").start()
+
+    def run_ai(self, a):
+        """Runs on the engine thread: grab the text, ask the AI, put the answer where the cursor is."""
+        op = "edit" if a.kind == "ai_edit" else "write"
+        if not self.brain.ready:
+            return "AI isn't set up - open Settings > AI (Ollama is free and private)."
+        exe, hwnd = self._foreground()
+        # in a terminal Ctrl+C would stop the running program, so never copy there
+        selected = "" if self.style_for(exe) == "terminal" else self.actions.copy_selection()
+        if selected.endswith("\n") and selected.count("\n") == 1:
+            selected = ""   # code editors copy the whole line when nothing is selected
+        selected = selected.strip()
+        fresh = bool(self._last_pasted) and hwnd == self._last_hwnd and time.time() - self._last_time < EDIT_LAST_SECS
+        source, how = self.ai.choose_source(op, selected, self._last_pasted.rstrip(), fresh)
+        if how not in ("replace_selection", "replace_last", "insert", "insert_after_selection"):
+            return how
+        try:
+            out = self.brain.complete(self.ai.build_prompt(self.ai.Intent(op, a.text), source))
+        except self.ai.AIError as e:
+            return str(e)
+        if not out:
+            return "The AI didn't send anything back."
+        if self._foreground()[1] != hwnd:
+            # you moved on while the AI was thinking - don't type into the wrong window
+            self.ui(lambda: self.window.clipboard_set(out))
+            self.record(out)
+            return "The AI answer is on your clipboard (you switched windows) - press Ctrl+V."
+        if how == "replace_last":
+            self.actions.select_back(len(self._last_pasted))
+        elif how == "insert_after_selection":
+            self.actions.collapse_selection()
+        self.actions.paste(out)
+        self._remember(out, hwnd)
+        self.record(out)
+        return f"AI: {out[:60]}"
+
+    # ---------- engine hooks ----------
+    def allowed(self, action):
+        """Keeps Sayso quiet in apps the user turned off."""
+        if action.kind in ("ui", "stop", "dictate_on", "dictate_off", "nothing"):
+            return None
+        if action.kind != "switch":
+            try:
+                if self.actions.foreground_is_admin():
+                    return "Can't type into apps running as administrator - Windows blocks it"
+            except Exception:
+                pass
+        disabled = set(self.cfg.disabled_apps)
+        if not disabled:
+            return None
+        if action.kind == "switch":
+            app = self.apps_mod.find_app(self.apps, action.text)
+            return f"Sayso is turned off for {app.name}" if app and app.id in disabled else None
+        try:
+            exe, title, _ = self.apps_mod.foreground()
+        except Exception:
+            return None
+        app = self.apps_mod.match_foreground(self.apps, exe, title)
+        if app and app.id in disabled:
+            return f"Sayso is turned off in {app.name} - turn it on in the Apps tab"
+        return None
+
+    # ---------- history (kept only on this PC) ----------
+    @staticmethod
+    def _history_path():
+        return data_dir() / "history.json"
+
+    def _load_history(self):
+        try:
+            return json.loads(self._history_path().read_text(encoding="utf-8"))[-HISTORY_MAX:]
+        except Exception:
+            return []
+
+    def clear_history(self):
+        self.history = []
+        self._history_path().write_text("[]", encoding="utf-8")
+        self.window.refresh_home()
+
+    # ---------- "try it" in setup / settings ----------
+    def start_test(self, callback):
+        """The next thing the user says to Sayso goes to callback(action) (on the UI thread), not into an app."""
+        self.test_listener = callback
+
+    def stop_test(self):
+        self.test_listener = None
+
+    def on_typed(self, action):
+        if self.test_listener is not None:
+            return
+        self.record(self._last_typed if action.kind in ("type", "type_send") else action.text)
+
+    def record(self, text):
+        n = len(text.split())
+
+        def save():
+            self.cfg.words_typed += n
+            self.cfg.save()
+            self.history = (self.history + [{"t": time.strftime("%H:%M"), "text": text}])[-HISTORY_MAX:]
+            try:
+                self._history_path().write_text(json.dumps(self.history), encoding="utf-8")
+            except Exception:
+                log.exception("history save failed")
+            self.window.refresh_home()
+        self.ui(save)
+
+    def status_text(self):
+        return self.STATUS.get(self.state, (self.state,))[0].format(wake=self.cfg.wake_word)
+
+    def on_state(self, state, msg):
+        self.state = state
+        if msg:
+            self.last_msg = msg
+        self.icon.icon = self.mic_icon(state)
+        self.icon.title = f"{APP_NAME} - {self.status_text()}" + (f"\n{msg[:60]}" if msg else "")
+        self.icon.update_menu()
+        self.window.update_state(state, msg)
+        if self.cfg.show_bubble:
+            self.window.bubble.show(state, msg, self.status_text())
+        if state == "error" and msg and msg != getattr(self, "_last_error", ""):
+            self.notify(msg)   # once per problem, not on every retry
+        self._last_error = msg if state == "error" else ""
+
+    def notify(self, msg):
+        try:
+            self.icon.notify(msg, APP_NAME)
+        except Exception:
+            pass
+
+    # ---------- used by the window ----------
+    def set_paused(self, paused: bool):
+        self.engine.set_paused(paused)
+        self.icon.update_menu()
+
+    def _set_autostart(self, on: bool):
+        try:
+            self.winutil.set_autostart(on)
+        except Exception:
+            log.exception("autostart change failed")
+
+    def update_cfg(self, **changes):
+        self.cfg = replace(self.cfg, **changes)
+        self.cfg.save()
+        if "launch_at_startup" in changes:
+            self._set_autostart(self.cfg.launch_at_startup)
+        if "ptt_key" in changes:
+            self.ptt.set_key(self.cfg.ptt_key)
+        if AI_KEYS & changes.keys():
+            threading.Thread(target=self.setup_ai, daemon=True, name="ai-setup").start()
+        if ENGINE_KEYS & changes.keys():
+            self.engine.apply_config(self.cfg)
+        else:
+            self.engine.cfg = self.cfg
+        log.info("settings changed: %s", changes)
+
+    def set_app_enabled(self, app_id: str, on: bool):
+        disabled = [a for a in self.cfg.disabled_apps if a != app_id]
+        if not on:
+            disabled.append(app_id)
+        self.update_cfg(disabled_apps=disabled)
+
+    def set_all_apps_enabled(self, on: bool):
+        self.update_cfg(disabled_apps=[] if on else [a.id for a in self.apps])
+
+    def rescan_apps(self):
+        if self.scanning:
+            return
+        self.scanning = True
+        self.window.apps_changed()
+
+        def work():
+            found = self.apps_mod.scan()
+
+            def done():
+                self.scanning = False
+                if found:
+                    self.apps = found
+                self.window.apps_changed()
+            self.ui(done)
+        threading.Thread(target=work, daemon=True, name="app-scan").start()
+
+    def check_for_update(self):
+        try:
+            req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/releases/latest",
+                                         headers={"Accept": "application/vnd.github+json"})
+            with urllib.request.urlopen(req, timeout=10) as r:
+                latest = json.loads(r.read()).get("tag_name", "")
+            if latest and version_tuple(latest) > version_tuple(__version__):
+                self.update_url = DOWNLOAD_PAGE
+                self.ui(lambda: (self.icon.update_menu(), self.notify(f"Sayso {latest} is available.")))
+        except Exception as e:
+            log.info("update check skipped: %s", e)
+
+    def quit(self):
+        self.engine.stop()
+        try:
+            self.icon.visible = False   # removes the tray icon straight away (no ghost icon)
+        except Exception:
+            pass
+        try:
+            self.icon.stop()
+        except Exception:
+            pass
+        self.window.quit()
+
+    def run(self):
+        threading.Thread(target=self.icon.run, daemon=True, name="tray").start()
+        self.engine.start()
+        self.ptt.start()
+        self.rescan_apps()
+        threading.Thread(target=self.check_for_update, daemon=True, name="update").start()
+        threading.Thread(target=self.setup_ai, daemon=True, name="ai-setup").start()
+        if self.cfg.first_run_done:
+            self.window.withdraw()   # already set up: live quietly in the tray
+        else:
+            self.window.show()
+        self.window.after(50, self._pump)
+        self.window.after(200, self.window.bubble.build)   # made up front so it never grabs focus later
+        self.window.mainloop()
+
+
+def main():
+    setup_logging()
+    log.info("%s %s starting", APP_NAME, __version__)
+    from sayso import winutil
+    if winutil.already_running():
+        winutil.message(APP_NAME, f"{APP_NAME} is already running - click the microphone icon by the clock.")
+        return
+    App().run()
