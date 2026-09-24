@@ -5,8 +5,9 @@ import time
 import webbrowser
 from ctypes import wintypes
 
-import pyperclip
-from pynput.keyboard import Controller, Key
+from pynput.keyboard import Controller, Key, KeyCode
+
+from sayso import winclip
 
 from sayso import apps as apps_mod
 from sayso.commands import Action
@@ -30,53 +31,39 @@ def _tap(key, *mods):
         kb.release(m)
 
 
+# Letter keys by virtual-key code, so Ctrl+V etc. work on any keyboard layout (Russian, Greek, Hindi...)
+VK = {"a": KeyCode.from_vk(0x41), "c": KeyCode.from_vk(0x43), "v": KeyCode.from_vk(0x56), "z": KeyCode.from_vk(0x5A)}
+PASTE_SETTLE_SECS = 0.45   # give slow apps (Electron, Office, remote desktop) time to read the clipboard
+
+
 def paste(text: str) -> None:
-    """Paste via the clipboard - instant and handles any characters. Restores the old clipboard text."""
-    try:
-        old = pyperclip.paste()
-    except Exception:
-        old = None
-    pyperclip.copy(text)
+    """Paste via the clipboard - instant and handles any characters. Everything that was on the
+    clipboard before (text, images, files) is put back afterwards."""
+    saved = winclip.snapshot()
+    if not winclip.set_text(text):
+        raise RuntimeError("the clipboard is busy - another app is holding it")
     time.sleep(0.03)
-    _tap("v", Key.ctrl)
-    time.sleep(0.2)  # let the target app read the clipboard before restoring
-    if old is not None:
-        try:
-            pyperclip.copy(old)
-        except Exception:
-            pass
+    _tap(VK["v"], Key.ctrl)
+    time.sleep(PASTE_SETTLE_SECS)
+    winclip.restore(saved)
 
 
-_SENTINEL = "\u2063sayso-no-selection\u2063"
-
-
-def copy_selection(wait: float = 0.45) -> str:
+def copy_selection(wait: float = 0.5) -> str:
     """Ctrl+C the selected text and give it back, leaving the clipboard as it was. "" if nothing is selected."""
-    try:
-        old = pyperclip.paste()
-    except Exception:
-        old = None
-    try:
-        pyperclip.copy(_SENTINEL)
-    except Exception:
-        return ""
-    _tap("c", Key.ctrl)
+    saved = winclip.snapshot()
+    before = winclip.sequence()
+    _tap(VK["c"], Key.ctrl)
     got = ""
     end = time.time() + wait
     while time.time() < end:
         time.sleep(0.04)
-        try:
-            cur = pyperclip.paste()
-        except Exception:
-            continue
-        if cur != _SENTINEL:
-            got = cur
+        if winclip.sequence() != before:
+            time.sleep(0.03)
+            got = winclip.get_text()
             break
-    try:
-        pyperclip.copy(old if old is not None else "")
-    except Exception:
-        pass
-    return got.strip()
+    if got:
+        winclip.restore(saved)
+    return got
 
 
 def select_back(chars: int) -> None:
@@ -96,6 +83,44 @@ def collapse_selection() -> None:
 
 def foreground_hwnd() -> int:
     return int(user32.GetForegroundWindow() or 0)
+
+
+def _elevated(pid: int) -> bool | None:
+    """True if the process runs as administrator. None if we can't tell."""
+    advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)   # own instance: typed 64-bit handles
+    k32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    k32.OpenProcess.restype = wintypes.HANDLE
+    k32.CloseHandle.argtypes = [wintypes.HANDLE]
+    advapi32.OpenProcessToken.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.POINTER(wintypes.HANDLE)]
+    advapi32.GetTokenInformation.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD,
+                                             ctypes.POINTER(wintypes.DWORD)]
+    h = k32.OpenProcess(0x1000, False, pid)
+    if not h:
+        return None
+    try:
+        tok = wintypes.HANDLE()
+        if not advapi32.OpenProcessToken(h, 0x0008, ctypes.byref(tok)):
+            return ctypes.get_last_error() == 5  # access denied: it's elevated and we're not
+        try:
+            elev, size = wintypes.DWORD(), wintypes.DWORD()
+            if not advapi32.GetTokenInformation(tok, 20, ctypes.byref(elev), 4, ctypes.byref(size)):
+                return None
+            return bool(elev.value)
+        finally:
+            k32.CloseHandle(tok)
+    finally:
+        k32.CloseHandle(h)
+
+
+def foreground_is_admin() -> bool:
+    """Windows won't let a normal app type into an app running as administrator."""
+    import os
+    if _elevated(os.getpid()):
+        return False
+    pid = wintypes.DWORD()
+    user32.GetWindowThreadProcessId(user32.GetForegroundWindow(), ctypes.byref(pid))
+    return bool(pid.value) and _elevated(pid.value) is True
 
 
 def _window_exe(hwnd) -> str:
@@ -212,7 +237,7 @@ def perform(action: Action, app_list: list, custom: dict | None = None) -> str:
         _tap(Key.enter, Key.shift)  # Shift+Enter = new line in chat boxes, normal newline elsewhere
         return "New line"
     if k == "undo":
-        _tap("z", Key.ctrl)
+        _tap(VK["z"], Key.ctrl)
         return "Undo"
     if k == "switch":
         return switch_to(action.text, app_list)

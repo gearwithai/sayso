@@ -36,7 +36,7 @@ def make_engine(texts, allowed=lambda a: None, **cfg):
                beep=lambda h: None, allowed=allowed, on_typed=lambda a: typed.append(len(a.text.split())))
     e._stt = FakeSTT(texts)
     e._load_models = lambda: None
-    e._open_mic = lambda: None
+    e._open_mic = lambda rescan=False: None
     return e, performed, states, typed, done
 
 
@@ -218,3 +218,46 @@ def test_ai_actions_show_asking_ai():
     assert done.wait(5)
     e.stop()
     assert performed[0].kind == "ai_edit" and ("thinking", "Asking AI...") in states
+
+
+def test_startup_keeps_retrying_until_the_model_loads():
+    e, performed, states, _, done = make_engine(["Sayso, hello."])
+    attempts = []
+
+    def flaky():
+        attempts.append(1)
+        if len(attempts) < 3:
+            raise OSError("no internet")
+    e._load_models = flaky
+    e.retry_secs = 0.1
+    e.start()
+    end = time.time() + 5
+    while time.time() < end and not any(s == "ready" for s, _ in states):
+        time.sleep(0.05)
+    feed(e, [LOUD] * 8 + PAUSE)
+    assert done.wait(5)
+    e.stop()
+    assert len(attempts) == 3
+    assert any(s == "error" and "internet" in m for s, m in states)
+    assert performed[0].text == "hello."
+
+
+def test_dictation_keeps_speech_said_while_typing():
+    """Talking straight on in dictation mode must not lose the next phrase."""
+    e, performed, _, _, _ = make_engine(["first part", "second part"])
+    slow = e.perform
+
+    def slow_perform(a):
+        time.sleep(0.6)   # pasting takes a moment...
+        return slow(a)
+    e.perform = slow_perform
+    e.dictating = True
+    e.start()
+    feed(e, [LOUD] * 6 + PAUSE)
+    time.sleep(0.2)
+    feed(e, [LOUD] * 6 + PAUSE)    # ...and the user keeps talking meanwhile
+    end = time.time() + 6
+    while time.time() < end and len(performed) < 2:
+        time.sleep(0.05)
+    e.stop()
+    assert [a.text for a in performed] == ["first part", "second part"]

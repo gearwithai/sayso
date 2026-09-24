@@ -25,6 +25,13 @@ def test_wake_heard(heard, rest):
     "Okay let's go",
     "Sales report is due",
     "Some other thing",
+    "Say something nice",
+    "Say hi to Mike",
+    "Stay safe out there",
+    "Sadly so",
+    "Save the file",
+    "Sorry, I missed that",
+    "So what do you think",
 ])
 def test_not_wake(heard):
     assert match(heard)[0] is False

@@ -27,7 +27,8 @@ MIN_UTTERANCE_SECS = 0.3
 
 LOADING, READY, LISTENING, THINKING, PAUSED, ERROR, DICTATING = (
     "loading", "ready", "listening", "thinking", "paused", "error", "dictating")
-DICTATION_IDLE_SECS = 120      # dictation mode switches itself off after this much quiet
+DICTATION_IDLE_SECS = 120
+MIC_STALE_SECS = 3.0           # no audio callbacks for this long = the mic went away      # dictation mode switches itself off after this much quiet
 # what can happen in dictation mode without saying the wake word first
 DICTATION_KINDS = {"type", "type_send", "send", "newline", "undo", "dictate_off"}
 
@@ -71,6 +72,8 @@ class Engine(threading.Thread):
         self.dictating = False
         self._last_speech = time.time()
         self.device = "cpu"
+        self._last_audio = time.time()
+        self._mic_ok = False
 
     # ---------- public, thread-safe ----------
     def set_paused(self, paused: bool):
@@ -118,6 +121,7 @@ class Engine(threading.Thread):
         return PAUSED if self.paused else DICTATING if self.dictating else READY
 
     def _on_audio(self, indata, frames, t, status):
+        self._last_audio = time.time()
         chunk = indata[:, 0].copy()
         self.level = rms(chunk)
         try:
@@ -129,13 +133,59 @@ class Engine(threading.Thread):
             except queue.Empty:
                 pass
 
-    def _open_mic(self):
+    def _mic_index(self, sd):
+        """The saved mic, found by name (device numbers change when things are plugged in).
+        Falls back to the Windows default mic when it isn't there."""
+        name = getattr(self.cfg, "mic_name", "") or ""
+        try:
+            devices = sd.query_devices()
+        except Exception:
+            return None
+        if name:
+            for i, d in enumerate(devices):
+                if d["max_input_channels"] > 0 and d["name"] == name:
+                    return i
+            return None
+        i = self.cfg.mic_device
+        if isinstance(i, int) and 0 <= i < len(devices) and devices[i]["max_input_channels"] > 0:
+            return i
+        return None
+
+    def _open_mic(self, rescan: bool = False):
         import sounddevice as sd
         if self._stream:
-            self._stream.close()
+            try:
+                self._stream.close()
+            except Exception:
+                pass
+            self._stream = None
+        if rescan:  # pick up mics plugged in since Sayso started
+            try:
+                sd._terminate()
+                sd._initialize()
+            except Exception:
+                log.exception("audio rescan failed")
+        self._mic_ok = False
         self._stream = sd.InputStream(samplerate=RATE, channels=1, dtype="int16", blocksize=CHUNK,
-                                      device=self.cfg.mic_device, callback=self._on_audio)
+                                      device=self._mic_index(sd), callback=self._on_audio)
         self._stream.start()
+        self._last_audio = time.time()
+        self._mic_ok = True
+
+    def _check_mic(self):
+        """If the mic goes quiet at the driver level (unplugged, Bluetooth dropped), reopen it."""
+        if not self._mic_ok or time.time() - self._last_audio < MIC_STALE_SECS:
+            return
+        self.level = 0.0
+        log.info("no audio for %ss - reopening the mic", MIC_STALE_SECS)
+        try:
+            self._open_mic(rescan=True)
+            self._set_state(self._idle_state(), "Microphone reconnected")
+        except Exception as e:
+            log.info("mic reopen failed: %s", e)
+            self._set_state(ERROR, "Lost the microphone - plug it back in or pick another in Settings.")
+            self._last_audio = time.time()  # try again in a few seconds
+            self._mic_ok = True
 
     @property
     def model_name(self) -> str:
@@ -160,7 +210,7 @@ class Engine(threading.Thread):
         from faster_whisper import WhisperModel
         root = str(models_dir() / "whisper")
         self._stt, self.device = None, "cpu"
-        if getattr(self.cfg, "use_gpu", True):
+        if getattr(self.cfg, "use_cuda", False):
             # NVIDIA graphics card: much faster. Falls back to the CPU if CUDA isn't usable.
             try:
                 import ctranslate2
@@ -329,28 +379,46 @@ class Engine(threading.Thread):
         self._act(self._transcribe(audio, self._vocab_prompt()), allow_commands=False)
 
     # ---------- main loop ----------
-    def run(self):
+    def _start(self) -> bool:
+        """Load the model and open the mic. On failure says what's wrong and returns False."""
         try:
             self._load_models()
-            self._open_mic()
         except Exception as e:
-            log.exception("startup failed")
-            self._set_state(ERROR, f"Couldn't start: {e}")
+            log.exception("model load failed")
+            self._set_state(ERROR, "Couldn't get the speech model - check your internet connection. "
+                                   "Sayso will keep trying." if self._loaded_model is None else f"Speech model problem: {e}")
+            return False
+        try:
+            self._open_mic(rescan=True)
+        except Exception as e:
+            log.exception("mic open failed")
+            self._mic_ok = False
+            self._set_state(ERROR, "No microphone found - plug one in or pick it in Settings. Sayso will keep trying.")
+            return False
+        return True
+
+    retry_secs = 3.0
+
+    def run(self):
+        delay = self.retry_secs
+        while not self._stop.is_set() and not self._start():
+            # wait, but wake up straight away if settings change (e.g. a different mic is picked)
+            self._reload.wait(delay)
+            self._reload.clear()
+            delay = min(delay * 2, 60)
+        if self._stop.is_set():
             return
         self._set_state(self._idle_state(), "Ready")
 
         while not self._stop.is_set():
             if self._reload.is_set():
                 self._reload.clear()
-                try:
-                    self._load_models()
-                    self._open_mic()
+                if self._start():
                     self._set_state(self._idle_state(), "Settings applied")
-                except Exception as e:
-                    log.exception("reload failed")
-                    self._set_state(ERROR, f"Settings problem: {e}")
-                    time.sleep(1)
+                else:
+                    threading.Timer(5, self._reload.set).start()  # keep retrying
                 continue
+            self._check_mic()
 
             try:
                 if self._ptt_down_at is not None:
@@ -379,12 +447,9 @@ class Engine(threading.Thread):
                     self._ptt_prefix = [chunk]
                     continue
                 self._hands_free(chunk)
-                if self._ptt_down_at is None:
-                    self._drain()
             except Exception:
                 log.exception("loop error")
                 self._set_state(self._idle_state(), "Something went wrong - see log")
-                self._drain()
 
         if self._stream:
             self._stream.close()

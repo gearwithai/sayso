@@ -14,6 +14,14 @@ def _letters(s: str) -> str:
     return re.sub(r"[^a-z]", "", s.lower())
 
 
+def _close_enough(heard: str, target: str, score: float, threshold: float) -> bool:
+    """A near-exact spelling always counts. A looser one ("Seso", "Saso") only counts when it is about
+    the same length and ends the same way - so "Say hi", "Stay safe" or "Sadly so" don't wake Sayso."""
+    if abs(len(heard) - len(target)) > 1:
+        return False
+    return score >= 0.8 or (score >= threshold and heard[-2:] == target[-2:])
+
+
 def match(transcript: str, wake: str = "Sayso", threshold: float = 0.66):
     """Returns (matched, remainder). Remainder is what was said after the wake word."""
     target = _letters(wake)
@@ -40,7 +48,7 @@ def match(transcript: str, wake: str = "Sayso", threshold: float = 0.66):
             best, best_n = score, n
         if len(joined) > len(target) + 3:
             break
-    if best < threshold:
+    if not _close_enough(_letters("".join(tokens[start:start + best_n])), target, best, threshold):
         return False, transcript
     rest = " ".join(tokens[start + best_n:])
     return True, rest.lstrip(" ,.;:!?-").strip()

@@ -1,6 +1,6 @@
 ; Inno Setup script - builds SaysoSetup.exe from the PyInstaller output in dist\Sayso
 #ifndef AppVersion
-  #define AppVersion "0.5.0"
+  #define AppVersion "0.5.1"
 #endif
 
 [Setup]
@@ -26,7 +26,7 @@ DisableReadyPage=yes
 AppPublisherURL=https://gearwithai.github.io/sayso/
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-CloseApplications=yes
+CloseApplications=force
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Options:"; Flags: unchecked
@@ -49,6 +49,16 @@ Filename: "taskkill"; Parameters: "/IM Sayso.exe /F"; Flags: runhidden; RunOnceI
 Type: filesandordirs; Name: "{userappdata}\Sayso"
 
 [Code]
+// Close a running Sayso before files are replaced (it lives in the tray, so ask it firmly)
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  Code: Integer;
+begin
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM Sayso.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  Sleep(500);
+  Result := '';
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if CurUninstallStep = usPostUninstall then

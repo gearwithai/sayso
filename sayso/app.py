@@ -19,7 +19,7 @@ log = logging.getLogger("sayso")
 REPO = "gearwithai/sayso"
 DOWNLOAD_PAGE = "https://gearwithai.github.io/sayso/"
 ENGINE_KEYS = {"hands_free", "wake_word", "stt_model", "mic_device", "silence_level", "silence_secs", "send_word",
-               "beeps", "max_secs", "language", "use_gpu"}
+               "beeps", "max_secs", "language", "use_cuda", "mic_name"}
 AI_KEYS = {"ai_provider", "ai_model", "ai_base_url", "ai_key"}
 CONTINUE_SECS = 45        # carry a sentence on if you speak again in the same window within this time
 EDIT_LAST_SECS = 300      # "make that more formal" works on what Sayso last typed for this long
@@ -50,6 +50,7 @@ class App:
         from sayso.commands import Action, parse
         from sayso.custom import CustomCommands
         from sayso.text import clean, continue_sentence, style_for
+        self.style_for = style_for
         from sayso import ai
 
         self.pystray, self.winutil, self.mic_icon, self.apps_mod, self.STATUS = pystray, winutil, mic_icon, apps, STATUS
@@ -209,7 +210,11 @@ class App:
         if not self.brain.ready:
             return "AI isn't set up - open Settings > AI (Ollama is free and private)."
         exe, hwnd = self._foreground()
-        selected = self.actions.copy_selection()
+        # in a terminal Ctrl+C would stop the running program, so never copy there
+        selected = "" if self.style_for(exe) == "terminal" else self.actions.copy_selection()
+        if selected.endswith("\n") and selected.count("\n") == 1:
+            selected = ""   # code editors copy the whole line when nothing is selected
+        selected = selected.strip()
         fresh = bool(self._last_pasted) and hwnd == self._last_hwnd and time.time() - self._last_time < EDIT_LAST_SECS
         source, how = self.ai.choose_source(op, selected, self._last_pasted.rstrip(), fresh)
         if how not in ("replace_selection", "replace_last", "insert", "insert_after_selection"):
@@ -237,8 +242,16 @@ class App:
     # ---------- engine hooks ----------
     def allowed(self, action):
         """Keeps Sayso quiet in apps the user turned off."""
+        if action.kind in ("ui", "stop", "dictate_on", "dictate_off", "nothing"):
+            return None
+        if action.kind != "switch":
+            try:
+                if self.actions.foreground_is_admin():
+                    return "Can't type into apps running as administrator - Windows blocks it"
+            except Exception:
+                pass
         disabled = set(self.cfg.disabled_apps)
-        if not disabled or action.kind == "ui":
+        if not disabled:
             return None
         if action.kind == "switch":
             app = self.apps_mod.find_app(self.apps, action.text)
@@ -298,8 +311,9 @@ class App:
         self.window.update_state(state, msg)
         if self.cfg.show_bubble:
             self.window.bubble.show(state, msg, self.status_text())
-        if state == "error" and msg:
-            self.notify(msg)
+        if state == "error" and msg and msg != getattr(self, "_last_error", ""):
+            self.notify(msg)   # once per problem, not on every retry
+        self._last_error = msg if state == "error" else ""
 
     def notify(self, msg):
         try:
@@ -373,7 +387,14 @@ class App:
 
     def quit(self):
         self.engine.stop()
-        self.icon.stop()
+        try:
+            self.icon.visible = False   # removes the tray icon straight away (no ghost icon)
+        except Exception:
+            pass
+        try:
+            self.icon.stop()
+        except Exception:
+            pass
         self.window.quit()
 
     def run(self):

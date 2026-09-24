@@ -69,6 +69,11 @@ def input_devices():
         return []
 
 
+def pick_mic(ctl, devices, name):
+    idx = dict(devices).get(name)
+    ctl.update_cfg(mic_device=idx, mic_name="" if idx is None else name)
+
+
 def open_mic_privacy():
     try:
         os.startfile("ms-settings:privacy-microphone")
@@ -296,10 +301,10 @@ class Wizard(ctk.CTkFrame):
             ctk.CTkLabel(b, text="1. Your microphone", font=font(15, "bold")).pack(anchor="w")
             devices = [("Windows default", None)] + input_devices()
             names = [n for n, _ in devices]
-            cur = next((n for n, i in devices if i == ctl.cfg.mic_device), "Windows default")
+            cur = ctl.cfg.mic_name if ctl.cfg.mic_name in names else "Windows default"
             menu = ctk.CTkOptionMenu(b, values=names, font=font(13), fg_color=ACCENT, button_color=ACCENT,
                                      button_hover_color=ACCENT_HOVER, dynamic_resizing=False, width=400,
-                                     command=lambda n: ctl.update_cfg(mic_device=dict(devices).get(n)))
+                                     command=lambda n: pick_mic(ctl, devices, n))
             menu.set(cur)
             menu.pack(anchor="w", pady=(8, 10))
             MicMeter(b, ctl.engine).pack(fill="x")
@@ -353,15 +358,17 @@ class Bubble:
     def build(self):
         if self.win is not None:
             return
-        w = ctk.CTkToplevel(self.root)
+        import tkinter as tk
+        # a plain Tk window: customtkinter's toplevel re-shows itself (and grabs focus) on theme changes
+        w = tk.Toplevel(self.root)
+        w.withdraw()
         w.overrideredirect(True)
         w.attributes("-topmost", True)
-        w.configure(fg_color="#1F1D26")
-        f = ctk.CTkFrame(w, fg_color="#1F1D26", corner_radius=0)
-        f.pack(fill="both", expand=True)
-        self.dot = ctk.CTkLabel(f, text="\u25cf", font=font(14), text_color="#E5484D")
+        w.configure(bg="#1F1D26")
+        self.dot = tk.Label(w, text="\u25cf", font=("Segoe UI", 12), fg="#E5484D", bg="#1F1D26")
         self.dot.pack(side="left", padx=(14, 6), pady=8)
-        self.text = ctk.CTkLabel(f, text="", font=font(13), text_color="#F4F3F8", wraplength=420, justify="left")
+        self.text = tk.Label(w, text="", font=("Segoe UI", 11), fg="#F4F3F8", bg="#1F1D26",
+                             wraplength=460, justify="left")
         self.text.pack(side="left", padx=(0, 16), pady=8)
         w.bind("<Button-1>", lambda _: self.hide())
         self.win = w
@@ -369,7 +376,10 @@ class Bubble:
             try:
                 import ctypes
                 u = ctypes.windll.user32
+                # map it once, invisible and off-screen, so Windows creates the real window
+                w.attributes("-alpha", 0.0)
                 w.geometry("+-3000+-3000")
+                w.deiconify()
                 w.update_idletasks()
                 w.update()
                 self.hwnd = u.GetParent(w.winfo_id()) or w.winfo_id()
@@ -393,7 +403,7 @@ class Bubble:
                 return self._later(0.1)
             color = STATUS.get(state, ("", "#6E56CF"))[1]
             line = status if state in ("listening", "dictating") or not msg else msg
-            self.dot.configure(text_color=color)
+            self.dot.configure(fg=color)
             self.text.configure(text=line[:140])
             self.win.update_idletasks()
             w, h = self.win.winfo_reqwidth(), self.win.winfo_reqheight()
@@ -588,7 +598,13 @@ class MainWindow(ctk.CTk):
         section("Microphone")
         devices = [("Windows default", None)] + input_devices()
         dev_map = {n: i for n, i in devices}
-        row("Mic", lambda r: menu(r, dev_map, cfg.mic_device, "mic_device"))
+        def mic_menu(r):
+            m = ctk.CTkOptionMenu(r, values=list(dev_map), width=170, font=font(13), fg_color=ACCENT,
+                                  button_color=ACCENT, button_hover_color=ACCENT_HOVER, dynamic_resizing=False,
+                                  command=lambda n: pick_mic(ctl, devices, n))
+            m.set(cfg.mic_name if cfg.mic_name in dev_map else "Windows default")
+            return m
+        row("Mic", mic_menu)
         row("Noisy room", lambda r: slider(r, "silence_level", 0.005, 0.05,
                                            lambda v: "quiet" if v < 0.012 else ("normal" if v < 0.025 else "noisy")))
         ctk.CTkButton(s, text="Windows microphone privacy settings", height=28, font=font(12),
@@ -609,7 +625,7 @@ class MainWindow(ctk.CTk):
         switch("Match the app (terminals, chats, documents)", "smart_format")
         switch("Carry on a sentence when you pause mid-thought", "smart_continue")
         switch("Show a status bubble above the taskbar", "show_bubble")
-        switch("Use my NVIDIA graphics card (faster)", "use_gpu")
+        switch("Use my NVIDIA graphics card (needs CUDA installed)", "use_cuda")
 
         self._ai_section(s, section, row)
 
@@ -744,7 +760,6 @@ class MainWindow(ctk.CTk):
             self.big.configure(text=text)
             if msg:
                 self.last.configure(text=msg)
-            self.refresh_home()
 
     def refresh_home(self):
         if not hasattr(self, "words"):

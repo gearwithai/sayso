@@ -35,7 +35,6 @@ STT_MODELS = {
 
 PTT_KEYS = {
     "Right Ctrl": "ctrl_r",
-    "Right Alt": "alt_r",
     "Right Shift": "shift_r",
     "F9": "f9",
     "Off": "",
@@ -49,6 +48,7 @@ class Config:
     ptt_key: str = "ctrl_r"             # hold to dictate; "" = off
     stt_model: str = "base.en"
     mic_device: int | None = None       # None = Windows default mic
+    mic_name: str = ""                  # the chosen mic by name (device numbers shift)
     silence_level: float = 0.015        # below this counts as silence
     silence_secs: float = 1.0           # pause length that ends a phrase
     max_secs: float = 45.0
@@ -64,7 +64,7 @@ class Config:
     smart_format: bool = True           # terminals: no capitals/full stops; chat apps: no full stop
     smart_continue: bool = True         # carry on a sentence in lower case
     show_bubble: bool = True            # small live status bubble above the taskbar
-    use_gpu: bool = True                # use an NVIDIA graphics card when possible
+    use_cuda: bool = False              # NVIDIA graphics card - needs CUDA installed, off by default
     ai_provider: str = "auto"           # auto (Ollama / LM Studio if running), off, ollama, lmstudio, openai, ...
     ai_model: str = ""
     ai_base_url: str = ""

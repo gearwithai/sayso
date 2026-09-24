@@ -1,5 +1,5 @@
 """Hold-to-talk key, watched with a global keyboard hook."""
-from pynput import keyboard
+from pynput import keyboard, mouse
 
 ALIASES = {
     "ctrl_r": {"ctrl_r"},
@@ -29,6 +29,18 @@ class PushToTalk:
         self._listener = keyboard.Listener(on_press=self._press, on_release=self._release)
         self._listener.daemon = True
         self._listener.start()
+        # Ctrl+click, Ctrl+scroll (zoom) and Ctrl+drag are normal shortcuts - not hold-to-talk
+        self._mouse = mouse.Listener(on_click=self._click, on_scroll=self._scroll)
+        self._mouse.daemon = True
+        self._mouse.start()
+
+    def _click(self, x, y, button, pressed):
+        if pressed and self.held:
+            self.engine.ptt_cancel()
+
+    def _scroll(self, x, y, dx, dy):
+        if self.held:
+            self.engine.ptt_cancel()
 
     def _press(self, key):
         n = _name(key)

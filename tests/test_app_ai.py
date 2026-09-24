@@ -26,6 +26,8 @@ class FakeActions:
 def make_app(selection="", hwnds=(7, 7), answer="Better."):
     app = object.__new__(App)
     app.ai, app.actions = ai, FakeActions(selection)
+    from sayso.text import style_for
+    app.style_for = style_for
     seen = []
     app.brain = ai.Brain("ollama", "http://x", "m", send=lambda u, h, b, t: (seen.append(b), {"message": {"content": answer}})[1])
     order = list(hwnds)
@@ -76,3 +78,20 @@ def test_ai_not_ready():
     app, _ = make_app()
     app.brain = ai.Brain("off", "", "")
     assert "Settings" in app.run_ai(Action("ai_write", "write a poem"))
+
+
+def test_terminal_never_gets_ctrl_c():
+    app, _ = make_app(selection="should not be read")
+    app._foreground = lambda: ("WindowsTerminal.exe", 7)
+    calls = []
+    app.actions.copy_selection = lambda: calls.append(1) or "x"
+    assert "Select" in app.run_ai(Action("ai_edit", "make that formal"))
+    assert calls == []
+
+
+def test_editor_line_copy_is_not_a_selection():
+    """VS Code copies the whole line (with a newline) when nothing is selected."""
+    app, _ = make_app(selection="    return x\n")
+    app._last_pasted, app._last_hwnd, app._last_time = "i think so ", 7, time.time()
+    app.run_ai(Action("ai_edit", "make that formal"))
+    assert app.actions.log[0] == ("select_back", len("i think so "))

@@ -31,6 +31,41 @@ jobs:
         with:
           name: SaysoSetup
           path: dist/SaysoSetup.exe
+      # ---- end-to-end on real Windows: the installed app, real speech, real typing ----
+      - name: Versions used in this build
+        run: pip freeze
+      - name: Make test speech with the Windows voice
+        run: python tests/e2e_windows.py --make-wavs e2e_wavs
+      - name: Install SaysoSetup.exe silently
+        run: |
+          $p = Start-Process dist\SaysoSetup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "installer exit code $($p.ExitCode)" }
+          if (-not (Test-Path "$env:LOCALAPPDATA\Programs\Sayso\Sayso.exe")) { throw "Sayso.exe not installed" }
+      - name: Self-test the installed app
+        timeout-minutes: 15
+        run: |
+          $p = Start-Process "$env:LOCALAPPDATA\Programs\Sayso\Sayso.exe" -ArgumentList '--selftest',"$pwd\selftest_out","$pwd\e2e_wavs" -Wait -PassThru
+          Get-Content selftest_out\selftest.json
+          if ($p.ExitCode -ne 0) { throw "self-test failed ($($p.ExitCode))" }
+      - name: End-to-end typing test (Notepad)
+        timeout-minutes: 20
+        run: python tests/e2e_windows.py --run e2e_wavs
+      - name: Upgrade over a running copy
+        run: |
+          Start-Process "$env:LOCALAPPDATA\Programs\Sayso\Sayso.exe"
+          Start-Sleep 10
+          if (-not (Get-Process Sayso -ErrorAction SilentlyContinue)) { throw "Sayso.exe didn't stay running" }
+          $p = Start-Process dist\SaysoSetup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "upgrade failed ($($p.ExitCode))" }
+          Get-Process Sayso -ErrorAction SilentlyContinue | Stop-Process -Force
+      - name: Save test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-output
+          path: |
+            selftest_out/selftest.json
+            selftest_out/profile/Sayso/sayso.log
       - name: Attach installer to the release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
