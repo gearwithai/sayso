@@ -83,11 +83,22 @@ def test_speech_without_wake_word_is_ignored():
     feed(e, [LOUD] * 10 + PAUSE)
     assert not done.wait(1.5)
     e.stop()
-    assert performed == [] and len(e._stt.calls) == 1
+    assert performed == [] and len(e._stt.calls) == 2   # second listen without the name hint
+    assert e._stt.calls[0][1] and e._stt.calls[1][1] is None
+
+
+def test_name_left_out_because_of_the_hint_is_found_on_a_second_listen():
+    # Whisper was hinted "Jarvis." and heard only "Hello."; without the hint it hears the name
+    e, performed, _, _, done = make_engine(["Hello.", "Jarvis, hello."], wake_word="Jarvis")
+    e.start()
+    feed(e, [LOUD] * 10 + PAUSE)
+    assert done.wait(3)
+    e.stop()
+    assert performed[0].kind == "type" and performed[0].text.lower().startswith("hello")
 
 
 def test_while_testing_the_name_ignored_speech_is_reported():
-    e, performed, _, _, done = make_engine(["Travis, hello"])
+    e, performed, _, _, done = make_engine(["Travis, hello", "Travis, hello"])
     missed = []
     e.on_ignored = missed.append
     e.start()

@@ -345,6 +345,13 @@ class Engine(threading.Thread):
         gate_text = self._transcribe(utt[:gate_len], prompt)
         woke, rest = wake.match(gate_text, cfg.wake_word)
         if not woke:
+            # The name is given to Whisper as a hint ("Jarvis."), and it sometimes treats the hint as
+            # already said and leaves the name out ("Jarvis, hello" -> "Hello."). Listen again without it.
+            plain = self._transcribe(utt[:gate_len])
+            woke, rest = wake.match(plain, cfg.wake_word)
+            if woke:
+                gate_text = plain
+        if not woke:
             log.debug("ignored: %r", gate_text)
             cb = self.on_ignored
             if cb is not None:
