@@ -1,14 +1,1 @@
-VSVersionInfo(
-  ffi=FixedFileInfo(filevers=(0, 5, 1, 0), prodvers=(0, 5, 1, 0)),
-  kids=[
-    StringFileInfo([StringTable('040904B0', [
-      StringStruct('CompanyName', 'GearWithAI'),
-      StringStruct('FileDescription', 'Sayso - hands-free voice typing'),
-      StringStruct('FileVersion', '0.5.1'),
-      StringStruct('ProductName', 'Sayso'),
-      StringStruct('ProductVersion', '0.5.1'),
-      StringStruct('OriginalFilename', 'Sayso.exe'),
-    ])]),
-    VarFileInfo([VarStruct('Translation', [1033, 1200])])
-  ]
-)
+VlNWZXJzaW9uSW5mbygKICBmZmk9Rml4ZWRGaWxlSW5mbyhmaWxldmVycz0oMCwgNSwgMiwgMCksIHByb2R2ZXJzPSgwLCA1LCAyLCAwKSksCiAga2lkcz1bCiAgICBTdHJpbmdGaWxlSW5mbyhbU3RyaW5nVGFibGUoJzA0MDkwNEIwJywgWwogICAgICBTdHJpbmdTdHJ1Y3QoJ0NvbXBhbnlOYW1lJywgJ0dlYXJXaXRoQUknKSwKICAgICAgU3RyaW5nU3RydWN0KCdGaWxlRGVzY3JpcHRpb24nLCAnU2F5c28gLSBoYW5kcy1mcmVlIHZvaWNlIHR5cGluZycpLAogICAgICBTdHJpbmdTdHJ1Y3QoJ0ZpbGVWZXJzaW9uJywgJzAuNS4yJyksCiAgICAgIFN0cmluZ1N0cnVjdCgnUHJvZHVjdE5hbWUnLCAnU2F5c28nKSwKICAgICAgU3RyaW5nU3RydWN0KCdQcm9kdWN0VmVyc2lvbicsICcwLjUuMicpLAogICAgICBTdHJpbmdTdHJ1Y3QoJ09yaWdpbmFsRmlsZW5hbWUnLCAnU2F5c28uZXhlJyksCiAgICBdKV0pLAogICAgVmFyRmlsZUluZm8oW1ZhclN0cnVjdCgnVHJhbnNsYXRpb24nLCBbMTAzMywgMTIwMF0pXSkKICBdCikK
