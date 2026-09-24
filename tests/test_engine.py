@@ -86,6 +86,17 @@ def test_speech_without_wake_word_is_ignored():
     assert performed == [] and len(e._stt.calls) == 1
 
 
+def test_while_testing_the_name_ignored_speech_is_reported():
+    e, performed, _, _, done = make_engine(["Travis, hello"])
+    missed = []
+    e.on_ignored = missed.append
+    e.start()
+    feed(e, [LOUD] * 10 + PAUSE)
+    assert not done.wait(1.5)
+    e.stop()
+    assert performed == [] and missed == ["Travis, hello"]
+
+
 def test_long_dictation_transcribes_full_audio():
     e, performed, _, _, done = make_engine(["Sayso, please note", "Sayso, please note the roof inspection is on Thursday"])
     e.start()

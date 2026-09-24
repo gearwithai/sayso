@@ -4,6 +4,7 @@ Everything saves as you change it - there is no Save button.
 Closing the window just hides it; Sayso keeps running in the tray.
 """
 import os
+import time
 from dataclasses import replace
 
 import customtkinter as ctk
@@ -268,7 +269,7 @@ class TryName(ctk.CTkFrame):
 
     def __init__(self, master, ctl, **kw):
         super().__init__(master, fg_color="transparent", **kw)
-        self.ctl, self.passed = ctl, False
+        self.ctl, self.passed, self._hold = ctl, False, 0.0
         r = ctk.CTkFrame(self, fg_color="transparent")
         r.pack(fill="x")
         self.name = ctk.StringVar(value=ctl.cfg.wake_word)
@@ -287,7 +288,7 @@ class TryName(ctk.CTkFrame):
         self.status = ctk.CTkLabel(self.card, text="", font=font(13), text_color=MUTED, justify="left", wraplength=390)
         self.status.pack(anchor="w", padx=16, pady=(0, 14))
         self.bind("<Destroy>", lambda e: e.widget is self and ctl.stop_test())
-        ctl.start_test(self.heard)
+        ctl.start_test(self.heard, self.missed)
         self._refresh()
         self._tick()
 
@@ -311,7 +312,9 @@ class TryName(ctk.CTkFrame):
             return
         state = getattr(self.ctl.engine, "state", "")
         n = self.ctl.cfg.wake_word
-        if state == "loading":
+        if time.time() < self._hold:
+            pass                      # keep showing what was just heard
+        elif state == "loading":
             self.status.configure(text="Getting ready - downloading the speech model (first time only)...",
                                   text_color=MUTED)
         elif state == "error":
@@ -332,6 +335,17 @@ class TryName(ctk.CTkFrame):
         self.status.configure(text=f"Heard: \u201c{said}\u201d. Nothing was typed - this was just a test.\n"
                                    f"Say it again any time, or carry on.", text_color=self.GOOD)
         self.after(5000, self._again)
+
+    def missed(self, text):
+        """Something was heard, but it didn't start with the name - show it so the user can adjust."""
+        text = (text or "").strip()
+        if not text or self.passed or not self.winfo_exists():
+            return
+        n = self.ctl.cfg.wake_word
+        self._hold = time.time() + 5
+        self.status.configure(text=f"Heard \u201c{text}\u201d - that didn't start with \u201c{n}\u201d.\n"
+                                   f"Try again a little slower, or pick a name that sounds more unusual.",
+                              text_color=self.BAD)
 
     def _again(self):
         if self.winfo_exists():

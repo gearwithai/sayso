@@ -62,6 +62,7 @@ class Engine(threading.Thread):
         self.paused = False
         self._stop = threading.Event()
         self._reload = threading.Event()
+        self.on_ignored = None   # set while the user is testing their wake word: gets what was heard
         self._ptt_down_at: float | None = None
         self._ptt_cancelled = False
         self._stream = None
@@ -345,6 +346,12 @@ class Engine(threading.Thread):
         woke, rest = wake.match(gate_text, cfg.wake_word)
         if not woke:
             log.debug("ignored: %r", gate_text)
+            cb = self.on_ignored
+            if cb is not None:
+                try:
+                    cb(gate_text)
+                except Exception:
+                    log.exception("on_ignored failed")
             return
 
         if not rest and len(utt) <= gate_len:

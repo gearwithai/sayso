@@ -287,12 +287,15 @@ class App:
         self.window.refresh_home()
 
     # ---------- "try it" in setup / settings ----------
-    def start_test(self, callback):
-        """The next thing the user says to Sayso goes to callback(action) (on the UI thread), not into an app."""
+    def start_test(self, callback, missed=None):
+        """What the user says to Sayso goes to callback(action) (on the UI thread), not into an app.
+        Speech that didn't start with the name goes to missed(text), so the user can see what was heard."""
         self.test_listener = callback
+        self.engine.on_ignored = (lambda t: self.ui(lambda: missed(t))) if missed else None
 
     def stop_test(self):
         self.test_listener = None
+        self.engine.on_ignored = None
 
     def on_typed(self, action):
         if self.test_listener is not None:

@@ -130,6 +130,8 @@ def run(folder: Path) -> int:
            ai_base_url=f"http://127.0.0.1:{server.server_port}/v1", show_bubble=True).save()
     from sayso.app import App, setup_logging
     setup_logging()
+    import logging
+    logging.getLogger("sayso").setLevel(logging.DEBUG)   # show ignored speech in the CI log
     app = App()
     app.engine._open_mic = lambda rescan=False: None   # the recorded phrases stand in for the mic
     results, failures = [], []
@@ -236,12 +238,13 @@ def run(folder: Path) -> int:
             # renaming: "call it anything, say it once, ready to drive"
             app.ui(lambda: app.update_cfg(wake_word="Jarvis"))
             time.sleep(1.5); settle()
-            heard = []
-            app.start_test(heard.append)
+            heard, missed = [], []
+            app.start_test(heard.append, missed.append)
             pad.clear(); pad.focus()
             say("12_jarvis_test"); settle()
             app.stop_test()
-            check("test mode hears the new name", bool(heard), [(a.kind, a.text) for a in heard])
+            check("test mode hears the new name", bool(heard),
+                  {"heard": [(a.kind, a.text) for a in heard], "not for us": missed})
             check("test mode types nothing", pad.text() == "", repr(pad.text()))
             say("13_jarvis_type"); settle()
             t = pad.text()
