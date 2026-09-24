@@ -35,10 +35,11 @@ Sayso is a free, open-source, hands-free voice typing app for Windows. Say "Says
 - Never store secrets in plain text: API keys go through `winutil.protect()` (DPAPI).
 - `.bat` and `.iss` files must keep CRLF line endings.
 - UI copy: short, plain words, no jargon.
+- Whisper gets the wake name as a hint and can drop it from the transcript; the gate re-listens without the hint (`engine._hands_free`). Keep that.
 
 ## Testing
 - `python -m pytest -q` - unit tests, run anywhere.
-- CI then tests on real Windows: installs the built `SaysoSetup.exe` silently, runs `Sayso.exe --selftest` (libraries, model download, clipboard, DPAPI, window), and runs `tests/e2e_windows.py`: phrases spoken by the Windows voice go through the real app and must appear in a real Notepad (wake word, false triggers ignored, AI edit via a fake local AI server, dictation, hold-to-talk, send, clipboard images preserved). Finally it upgrades over a running copy. A release only gets its installer if all of that passes.
+- CI then tests on real Windows: installs the built `SaysoSetup.exe` silently, runs `Sayso.exe --selftest` (libraries, model download, clipboard, DPAPI, window), and runs `tests/e2e_windows.py`: phrases spoken by the Windows voice go through the real app and must appear in a real Notepad (wake word, false triggers ignored, AI edit via a fake local AI server, dictation, hold-to-talk, send, switching apps, renaming the wake word to "Jarvis", clipboard images preserved). Finally it upgrades over a running copy. A release only gets its installer if all of that passes.
 
 ## Releasing
 1. Bump the version in `sayso/__init__.py`, `installer/version_info.txt` and the default in `installer/sayso.iss`.
@@ -49,6 +50,6 @@ Sayso is a free, open-source, hands-free voice typing app for Windows. Say "Says
 - GitHub Pages: download page. GitHub Releases: installer hosting.
 - Supabase project `laeitoulfslncjyolkpg`: `downloads` table + `sayso_download_count()` RPC (used only if sign-in is turned back on). Google/GitHub OAuth is not configured. The old `sayso-api` edge function is unused and can be deleted.
 
-## Status (v0.5.1)
-Shipped: wake word, hold-to-talk, commands, snippets, custom commands, per-app on/off, history, AI voice actions, dictation mode, app-aware formatting, status bubble, GPU with CPU fallback.
+## Status (v0.5.2)
+Shipped: custom wake name with a say-it-once test ("ready to drive"), wake word, hold-to-talk, commands, snippets, custom commands, per-app on/off, history, AI voice actions, dictation mode, app-aware formatting, status bubble, GPU with CPU fallback.
 Not yet verified by a human on real Windows hardware. Ideas next: streaming AI answers, a trained "Hey Sayso" wake word, command packs, code signing.
