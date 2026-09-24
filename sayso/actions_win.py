@@ -1,5 +1,6 @@
 """Windows side effects: paste text, press keys, switch to / open apps."""
 import ctypes
+import logging
 import subprocess
 import time
 import webbrowser
@@ -8,6 +9,8 @@ from ctypes import wintypes
 from pynput.keyboard import Controller, Key, KeyCode
 
 from sayso import winclip
+
+log = logging.getLogger("sayso.actions")
 
 from sayso import apps as apps_mod
 from sayso.commands import Action
@@ -40,6 +43,13 @@ def paste(text: str) -> None:
     """Paste via the clipboard - instant and handles any characters. Everything that was on the
     clipboard before (text, images, files) is put back afterwards."""
     saved = winclip.snapshot()
+    try:
+        fg = user32.GetForegroundWindow()
+        cls = ctypes.create_unicode_buffer(64)
+        user32.GetClassNameW(fg, cls, 64)
+        log.info("pasting %d chars into %s (%s)", len(text), cls.value, _window_exe(fg).rsplit("\\", 1)[-1])
+    except Exception:
+        pass
     if not winclip.set_text(text):
         raise RuntimeError("the clipboard is busy - another app is holding it")
     time.sleep(0.03)
@@ -155,12 +165,31 @@ def _windows():
 
 
 def _focus(hwnd):
+    """Bring a window to the front. Windows only lets the app in front hand over focus, so we borrow
+    its input queue (AttachThreadInput). The old trick of tapping Alt opens the menu bar in apps like
+    Notepad and Office - the next paste then vanishes into the menu - so it is only a masked fallback."""
     if user32.IsIconic(hwnd):
         user32.ShowWindow(hwnd, SW_RESTORE)
-    # Windows only lets the foreground app change focus; a synthetic Alt tap unlocks it.
-    user32.keybd_event(VK_MENU, 0, 0, 0)
-    user32.SetForegroundWindow(hwnd)
-    user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
+    fg = user32.GetForegroundWindow()
+    if fg == hwnd:
+        return
+    me = kernel32.GetCurrentThreadId()
+    other = user32.GetWindowThreadProcessId(fg, None) if fg else 0
+    attached = bool(other) and other != me and bool(user32.AttachThreadInput(me, other, True))
+    try:
+        user32.BringWindowToTop(hwnd)
+        user32.SetForegroundWindow(hwnd)
+    finally:
+        if attached:
+            user32.AttachThreadInput(me, other, False)
+    if user32.GetForegroundWindow() != hwnd:
+        # fallback: Alt unlocks SetForegroundWindow; an unassigned key in between (0xE8) stops the
+        # Alt release from opening the menu bar
+        user32.keybd_event(VK_MENU, 0, 0, 0)
+        user32.keybd_event(0xE8, 0, 0, 0)
+        user32.keybd_event(0xE8, 0, KEYEVENTF_KEYUP, 0)
+        user32.SetForegroundWindow(hwnd)
+        user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
 
 
 def switch_to(spoken: str, app_list: list) -> str:

@@ -32,6 +32,8 @@ PHRASES = {
     "07_dictation_off": "Stop dictation.",
     "08_hold": "This was typed with hold to talk.",
     "09_send": "Say-so, send.",
+    "10_switch": "Say-so, switch to Notepad.",
+    "11_after_switch": "Say-so, typed right after switching.",
 }
 AI_ANSWER = "The meeting is scheduled for 5 PM."
 
@@ -57,6 +59,7 @@ user32.FindWindowExW.restype = wintypes.HWND
 user32.FindWindowExW.argtypes = [wintypes.HWND, wintypes.HWND, wintypes.LPCWSTR, wintypes.LPCWSTR]
 user32.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
 user32.SendMessageW.restype = ctypes.c_ssize_t
+user32.GetShellWindow.restype = wintypes.HWND
 WM_SETTEXT, WM_GETTEXT, WM_GETTEXTLENGTH = 0x000C, 0x000D, 0x000E
 
 
@@ -215,6 +218,17 @@ def run(folder: Path) -> int:
             say("09_send"); settle()
             t = pad.text()
             check("'Sayso, send' presses Enter", "\r\n" in t or "\n" in t, repr(t))
+
+            # switching apps by voice, then dictating straight away (the Alt-key/menu-bar bug)
+            pad.clear()
+            user32.SetForegroundWindow(user32.GetShellWindow())
+            time.sleep(0.5)
+            say("10_switch"); settle()
+            check("'switch to Notepad' brings it to the front", user32.GetForegroundWindow() == pad.hwnd,
+                  app.last_msg)
+            say("11_after_switch"); settle()
+            t = pad.text()
+            check("typing works right after switching", "after switching" in t.lower(), repr(t))
 
             check("history recorded", len(app.history) >= 3, len(app.history))
             pad.close()
